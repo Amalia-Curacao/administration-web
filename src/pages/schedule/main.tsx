@@ -13,6 +13,7 @@ import axios from "axios";
 const _info = {name: "Schedules", icon: <GrSchedules/>};
 
 function ScheduleMain(): ReactElement {   
+    console.log(process.env.REACT_APP_API_URL);
     function createSchedule(schedule: Schedule): void {
         axios.get(process.env.REACT_APP_API_URL + "/Schedules/Create/" + schedule.name)
         .then(res => res.status === 200 
