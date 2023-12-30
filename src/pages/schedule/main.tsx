@@ -13,7 +13,6 @@ import axios from "axios";
 const _info = {name: "Schedules", icon: <GrSchedules/>};
 
 function ScheduleMain(): ReactElement {   
-    console.log(process.env.REACT_APP_API_URL);
     function createSchedule(schedule: Schedule): void {
         axios.get(process.env.REACT_APP_API_URL + "/Schedules/Create/" + schedule.name)
         .then(res => res.status === 200 
@@ -22,7 +21,6 @@ function ScheduleMain(): ReactElement {
     }
 
     function getSchedules(): void {
-        console.log(process.env.REACT_APP_API_URL);
         axios.get(process.env.REACT_APP_API_URL + "/Schedules/Get")
         .then(res => res.status === 200 
             ? setSchedules(res.data as Schedule[])
@@ -37,7 +35,6 @@ function ScheduleMain(): ReactElement {
     }
 
     function editSchedule(schedule: Schedule): void{
-        console.log(schedule);
         axios.post(process.env.REACT_APP_API_URL + "/Schedules/Edit/", {id: schedule.id, name: schedule.name})
         .then(res => {
             res.status === 200 
