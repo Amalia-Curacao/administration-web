@@ -3,7 +3,7 @@ import Guest from "../models/Guest";
 import PersonPrefix from "../models/PersonPrefix";
 import Reservation from "../models/Reservation";
 import RoomType from "../models/RoomType";
-import { toDateOnlyString } from "./Date";
+import { toDateOnlyString, toTimeOnlyString } from "./Date";
 // Purpose
 // ToJson: converts an object to a json string
 // ToJsonReservation: converts a reservation object to a json string
@@ -31,9 +31,9 @@ export function ToJsonReservation(reservation: Reservation): any{
         roomType: ToJsonRoomType(reservation.roomType!), 
         bookingSource: ToJsonBookingSource(reservation.bookingSource!),
         flightArrivalNumber: reservation.flightArrivalNumber,
-        flightArrivalTime: reservation.flightArrivalTime,
+        flightArrivalTime: !reservation.flightArrivalTime ? undefined : toTimeOnlyString(reservation.flightArrivalTime),
         flightDepartureNumber: reservation.flightDepartureNumber,
-        flightDepartureTime: reservation.flightDepartureTime,
+        flightDepartureTime: !reservation.flightDepartureTime ? undefined : toTimeOnlyString(reservation.flightDepartureTime),
         schedule: reservation.schedule,
         scheduleId: reservation.scheduleId,
         remarks: reservation.remarks,
@@ -49,12 +49,12 @@ export function ToJsonRoomType(roomType: RoomType): number{
         case RoomType.Room:
             return 2;
         default:
-            console.log(roomType);
             throw new Error("RoomType is not implemented");
     }
 }
 
 export function ToJsonBookingSource(bookingSource: BookingSource): number{
+    console.log(bookingSource);
     switch(bookingSource){
         case BookingSource.None:
             return 0;

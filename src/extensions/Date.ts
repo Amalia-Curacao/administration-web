@@ -33,7 +33,7 @@ export function toDateOnlyString(date: Date): string {
 }
 
 export function toTimeOnlyString(date: Date): string {
-    if(date instanceof Date) return date.toISOString().split('T')[1];
+    if(date instanceof Date) return date.toISOString().split('T')[1].split('.')[0];
     else return date
 }
 
@@ -41,8 +41,17 @@ export function toDateTimeString(date: Date): string {
     return date.toISOString();
 }
 
+export function HourMinuteToDateTime(s: string | undefined): Date | undefined {
+    if(s === undefined || s.length === 0) return;
+    return new Date("0000-01-01T" + s + ":00");
+}
+
 export function DateOnlyToDateTime(date: Date): Date {
     return new Date(date as unknown as string + 'T00:00:00');
+}
+
+export function TimeOnlyToDateTime(date: Date): Date {
+    return new Date("0000-01-01T" + date as unknown as string);
 }
 
 export function compareTo(date1: Date, date2: Date): number {

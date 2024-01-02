@@ -3,7 +3,7 @@ import Reservation from "../../models/Reservation";
 import BookingSource from "../../models/BookingSource";
 import RoomType from "../../models/RoomType";
 import "../../scss/reservation.create.scss";
-import { toDateOnlyString, toTimeOnlyString } from "../../extensions/Date";
+import { HourMinuteToDateTime, toDateOnlyString, toTimeOnlyString } from "../../extensions/Date";
 import References from "../../tools/References";
 import InputField from "../../components/inputField";
 import Guest from "../../models/Guest";
@@ -19,7 +19,7 @@ function Body({reservation}: {reservation: Reservation}): ReactElement {
                         <label className="d-flex flex-column w-100">Booking Source
                                 <InputField refKey="booking-source" references={references}>
                                     <select onChange={updateBookingSource} ref={references.GetSelect("booking-source")} defaultValue={reservation.bookingSource ? reservation.bookingSource : BookingSource.None } className="form-control">
-                                        {Object.values(BookingSource).map((value, index) => <option key={index} value={value}>{value}</option>)}
+                                        {Object.values(BookingSource).map((value) => <option key={value} value={value}>{value}</option>)}
                                     </select>
                                 </InputField>
                         </label>
@@ -88,7 +88,9 @@ function Body({reservation}: {reservation: Reservation}): ReactElement {
 
     // #region update functions
     function updateBookingSource(): void {
-        reservation.bookingSource = BookingSource[references.GetSelect("booking-source")!.current?.value! as keyof typeof BookingSource];
+        const input = references.GetSelect("booking-source")!.current?.value!;
+        const key = Object.keys(BookingSource).find((key: string) => BookingSource[key as keyof typeof BookingSource] === input);
+        if(key !== undefined) reservation.bookingSource = BookingSource[key as keyof typeof BookingSource];
     }
 
     function updateCheckIn(): void {
@@ -108,11 +110,13 @@ function Body({reservation}: {reservation: Reservation}): ReactElement {
     }
 
     function updateFlightArrivalTime(): void {
-        reservation.flightArrivalTime = new Date(references.GetInput("flight-arrival-time")!.current?.value!);
+        const arrTime = references.GetInput("flight-arrival-time")!.current?.value;
+        if(arrTime !== undefined) reservation.flightArrivalTime = HourMinuteToDateTime(arrTime);
     }
 
     function updateFlightDepartureTime(): void {
-        reservation.flightDepartureTime = new Date(references.GetInput("flight-departure-time")!.current?.value!);
+        const depTime = references.GetInput("flight-departure-time")!.current?.value;
+        if(depTime !== undefined) reservation.flightDepartureTime = HourMinuteToDateTime(depTime);
     }
 
     function updateRemarks(): void {
@@ -128,8 +132,8 @@ function Action(scheduleId: number, roomNumber: number, roomType: RoomType, rese
         checkOut: new Date(references.GetInput("check-out")!.current?.value!),
         flightArrivalNumber: references.GetInput("flight-arrival-number")!.current?.value!,
         flightDepartureNumber: references.GetInput("flight-departure-number")!.current?.value!,
-        flightArrivalTime: new Date(references.GetInput("flight-arrival-time")!.current?.value!),
-        flightDepartureTime: new Date(references.GetInput("flight-departure-time")!.current?.value!),
+        flightArrivalTime: HourMinuteToDateTime(references.GetInput("flight-arrival-time")!.current?.value),
+        flightDepartureTime: HourMinuteToDateTime(references.GetInput("flight-departure-time")!.current?.value),
         bookingSource: BookingSource[references.GetSelect("booking-source")!.current?.value! as keyof typeof BookingSource],
         remarks: references.GetInput("remarks")!.current?.value!,
 
