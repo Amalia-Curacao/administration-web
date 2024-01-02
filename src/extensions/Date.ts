@@ -27,7 +27,7 @@ export function youngest(date1: Date, date2: Date): Date {
     return dateTime1 < dateTime2 ? date1 : date2;
 }
 
-export function toDateOnlyString(date: Date): string {
+/* export function toDateOnlyString(date: Date): string {
     if(date instanceof Date) return date.toISOString().split('T')[0];
     else return date;
 }
@@ -43,16 +43,17 @@ export function toDateTimeString(date: Date): string {
 
 export function HourMinuteToDateTime(s: string | undefined): Date | undefined {
     if(s === undefined || s.length === 0) return;
-    return new Date("0000-01-01T" + s + ":00");
+    console.log(new Date("0000-01-01T" + s + ":00.000"));
+    return new Date("0000-01-01T" + s + ":00.000");
 }
 
 export function DateOnlyToDateTime(date: Date): Date {
-    return new Date(date as unknown as string + 'T00:00:00');
+    return new Date(date as unknown as string + 'T00:00:00.000');
 }
 
 export function TimeOnlyToDateTime(date: Date): Date {
     return new Date("0000-01-01T" + date as unknown as string);
-}
+} */
 
 export function compareTo(date1: Date, date2: Date): number {
     const dateTime1 = new Date(date1);

@@ -1,19 +1,14 @@
-import { DateOnlyToDateTime, HourMinuteToDateTime, TimeOnlyToDateTime } from "../extensions/Date";
 import Reservation from "../models/Reservation";
+import { default as MapDateOnly } from "./dateonly";
+import { default as MapTimeOnly } from "./timeonly";
 
 export default function Map(reservation: Reservation): Reservation{
-    const arrivalTime = reservation.flightArrivalTime ? TimeOnlyToDateTime(reservation.flightArrivalTime) : undefined;
-    const departureTime = reservation.flightDepartureTime ? TimeOnlyToDateTime(reservation.flightDepartureTime) : undefined;
     return {
         ...reservation,
-        checkIn: new Date(DateOnlyToDateTime(reservation.checkIn!)),
-        checkOut: new Date(DateOnlyToDateTime(reservation.checkOut!)),
-        flightArrivalTime: !arrivalTime 
-            ? undefined 
-            : HourMinuteToDateTime(arrivalTime.getHours() + ":" + arrivalTime.getMinutes()),
-        flightDepartureTime: !departureTime 
-            ? undefined 
-            : HourMinuteToDateTime(departureTime.getHours() + ":" + departureTime.getMinutes()),
+        checkIn: MapDateOnly(reservation.checkIn as unknown as string),
+        checkOut: MapDateOnly(reservation.checkOut as unknown as  string),
+        flightArrivalTime: MapTimeOnly(reservation.flightArrivalTime as unknown as string),
+        flightDepartureTime: MapTimeOnly(reservation.flightDepartureTime as unknown as string),
     }
 }
 
