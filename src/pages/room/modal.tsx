@@ -126,7 +126,9 @@ function GuestModal({show, guest, onClose, onSave, onRemove}: {show: boolean, gu
 
 function CreateGuestModal({show, reservation, onClose, onSave, onRemove}: {show: boolean, reservation: Reservation, onClose: VoidFunction, onSave: (g: Guest) => void, onRemove: (g: Guest) => void}): ReactElement {
     const blankGuest: Guest = {
-        id: -reservation.guests!.length,
+        // The negative Id ensures that the backend creates a new id automatically when creating a new guest.
+        // The -1 at the end ensures that when a guest is added for the first time the id is -1 instead of 0.
+        id: -reservation.guests!.length - 1,
         firstName: undefined,
         lastName: undefined,
         prefix: PersonPrefix.Unknown,

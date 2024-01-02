@@ -3,7 +3,6 @@ import Guest from "../models/Guest";
 import PersonPrefix from "../models/PersonPrefix";
 import Reservation from "../models/Reservation";
 import RoomType from "../models/RoomType";
-import { toDateOnlyString } from "./Date";
 // Purpose
 // ToJson: converts an object to a json string
 // ToJsonReservation: converts a reservation object to a json string
@@ -24,20 +23,30 @@ export function ToJsonReservation(reservation: Reservation): any{
     return {
         id: reservation.id,
         guests: undefined,
-        checkIn: !reservation.checkIn ? undefined : toDateOnlyString(reservation.checkIn), 
-        checkOut: !reservation.checkOut ? undefined : toDateOnlyString(reservation.checkOut),
+        checkIn: !reservation.checkIn ? undefined : toJsonDateOnly(reservation.checkIn), 
+        checkOut: !reservation.checkOut ? undefined : toJsonDateOnly(reservation.checkOut),
         room: reservation.room,
         roomNumber: reservation.roomNumber,
         roomType: ToJsonRoomType(reservation.roomType!), 
         bookingSource: ToJsonBookingSource(reservation.bookingSource!),
         flightArrivalNumber: reservation.flightArrivalNumber,
-        flightArrivalTime: reservation.flightArrivalTime,
+        flightArrivalTime: !reservation.flightArrivalTime ? undefined : toJsonTimeOnly(reservation.flightArrivalTime),
         flightDepartureNumber: reservation.flightDepartureNumber,
-        flightDepartureTime: reservation.flightDepartureTime,
+        flightDepartureTime: !reservation.flightDepartureTime ? undefined : toJsonTimeOnly(reservation.flightDepartureTime),
         schedule: reservation.schedule,
         scheduleId: reservation.scheduleId,
         remarks: reservation.remarks,
     };
+}
+
+export function toJsonDateOnly(date: Date): string {
+    if(date instanceof Date) return date.toISOString().split('T')[0];
+    else return date;
+}
+
+export function toJsonTimeOnly(date: Date): string {
+    if (date instanceof Date) return date.toTimeString().split(' ')[0];
+    else return date;
 }
 
 export function ToJsonRoomType(roomType: RoomType): number{
@@ -49,12 +58,12 @@ export function ToJsonRoomType(roomType: RoomType): number{
         case RoomType.Room:
             return 2;
         default:
-            console.log(roomType);
             throw new Error("RoomType is not implemented");
     }
 }
 
 export function ToJsonBookingSource(bookingSource: BookingSource): number{
+    console.log(bookingSource);
     switch(bookingSource){
         case BookingSource.None:
             return 0;

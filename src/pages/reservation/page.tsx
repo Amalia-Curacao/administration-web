@@ -3,10 +3,12 @@ import Reservation from "../../models/Reservation";
 import BookingSource from "../../models/BookingSource";
 import RoomType from "../../models/RoomType";
 import "../../scss/reservation.create.scss";
-import { toDateOnlyString, toTimeOnlyString } from "../../extensions/Date";
 import References from "../../tools/References";
 import InputField from "../../components/inputField";
 import Guest from "../../models/Guest";
+import { toJsonDateOnly, toJsonTimeOnly } from "../../extensions/ToJson";
+import { default as MapTimeOnly } from "../../mapping/timeonly";
+import { default as MapDateOnly } from "../../mapping/dateonly";
 
 const references: References = new References();
 
@@ -19,7 +21,7 @@ function Body({reservation}: {reservation: Reservation}): ReactElement {
                         <label className="d-flex flex-column w-100">Booking Source
                                 <InputField refKey="booking-source" references={references}>
                                     <select onChange={updateBookingSource} ref={references.GetSelect("booking-source")} defaultValue={reservation.bookingSource ? reservation.bookingSource : BookingSource.None } className="form-control">
-                                        {Object.values(BookingSource).map((value, index) => <option key={index} value={value}>{value}</option>)}
+                                        {Object.values(BookingSource).map((value) => <option key={value} value={value}>{value}</option>)}
                                     </select>
                                 </InputField>
                         </label>
@@ -29,14 +31,14 @@ function Body({reservation}: {reservation: Reservation}): ReactElement {
                     <td className="bg-primary text-secondary">
                         <label className="w-100">Check In
                             <InputField refKey="check-in" references={references}>
-                                <input onChange={updateCheckIn} ref={references.GetInput("check-in")} defaultValue={!reservation.checkIn ? "" : toDateOnlyString(reservation.checkIn!)} type="date" className="form-control"/>
+                                <input onChange={updateCheckIn} ref={references.GetInput("check-in")} defaultValue={!reservation.checkIn ? "" : toJsonDateOnly(reservation.checkIn!)} type="date" className="form-control"/>
                             </InputField>
                         </label>
                     </td>
                     <td className="bg-primary text-secondary">
                         <label className="w-100">Check Out
                             <InputField refKey="check-out" references={references}>
-                                <input onChange={updateCheckOut} ref={references.GetInput("check-out")} defaultValue={!reservation.checkOut ? "" : toDateOnlyString(reservation.checkOut!)} type="date" className="form-control"/>
+                                <input onChange={updateCheckOut} ref={references.GetInput("check-out")} defaultValue={!reservation.checkOut ? "" : toJsonDateOnly(reservation.checkOut!)} type="date" className="form-control"/>
                             </InputField>
                         </label>
                     </td>
@@ -61,14 +63,14 @@ function Body({reservation}: {reservation: Reservation}): ReactElement {
                     <td className="bg-primary text-secondary">
                         <label className="w-100">Flight Arrival Time
                             <InputField refKey="flight-arrival-time" references={references}>
-                                <input onChange={updateFlightArrivalTime} defaultValue={!reservation.flightArrivalTime ? "" : toTimeOnlyString(reservation.flightArrivalTime!)} ref={references.GetInput("flight-arrival-time")} type="time" className="form-control"/>
+                                <input onChange={updateFlightArrivalTime} defaultValue={!reservation.flightArrivalTime ? "" : toJsonTimeOnly(reservation.flightArrivalTime!).split(':').slice(0, 2).join(':')} ref={references.GetInput("flight-arrival-time")} type="time" className="form-control"/>
                             </InputField>
                         </label>
                     </td>
                     <td className="bg-primary text-secondary">
                         <label className="w-100">Flight Departure Time
                             <InputField refKey="flight-departure-time" references={references}>
-                                <input onChange={updateFlightDepartureTime} defaultValue={!reservation.flightDepartureTime ? "" : toTimeOnlyString(reservation.flightDepartureTime!)} ref={references.GetInput("flight-departure-time")} type="time" className="form-control"/>
+                                <input onChange={updateFlightDepartureTime} defaultValue={!reservation.flightDepartureTime ? "" : toJsonTimeOnly(reservation.flightDepartureTime!).split(':').slice(0, 2).join(':')} ref={references.GetInput("flight-departure-time")} type="time" className="form-control"/>
                             </InputField>
                         </label>
                     </td>
@@ -88,15 +90,17 @@ function Body({reservation}: {reservation: Reservation}): ReactElement {
 
     // #region update functions
     function updateBookingSource(): void {
-        reservation.bookingSource = BookingSource[references.GetSelect("booking-source")!.current?.value! as keyof typeof BookingSource];
+        const input = references.GetSelect("booking-source")!.current?.value!;
+        const key = Object.keys(BookingSource).find((key: string) => BookingSource[key as keyof typeof BookingSource] === input);
+        if(key !== undefined) reservation.bookingSource = BookingSource[key as keyof typeof BookingSource];
     }
 
     function updateCheckIn(): void {
-        reservation.checkIn = new Date(references.GetInput("check-in")!.current?.value!);
+        reservation.checkIn = MapDateOnly(references.GetInput("check-in")!.current?.value!);
     }
 
     function updateCheckOut(): void {
-        reservation.checkOut = new Date(references.GetInput("check-out")!.current?.value!);
+        reservation.checkOut = MapDateOnly(references.GetInput("check-out")!.current?.value!);
     }
 
     function updateFlightArrivalNumber(): void {
@@ -108,11 +112,13 @@ function Body({reservation}: {reservation: Reservation}): ReactElement {
     }
 
     function updateFlightArrivalTime(): void {
-        reservation.flightArrivalTime = new Date(references.GetInput("flight-arrival-time")!.current?.value!);
+        const input = references.GetInput("flight-arrival-time")!.current?.value;
+        if(input !== undefined) reservation.flightArrivalTime = MapTimeOnly(input)
     }
 
     function updateFlightDepartureTime(): void {
-        reservation.flightDepartureTime = new Date(references.GetInput("flight-departure-time")!.current?.value!);
+        const input = references.GetInput("flight-departure-time")!.current?.value;
+        if(input !== undefined) reservation.flightDepartureTime = MapTimeOnly(input)
     }
 
     function updateRemarks(): void {
@@ -124,12 +130,12 @@ function Body({reservation}: {reservation: Reservation}): ReactElement {
 function Action(scheduleId: number, roomNumber: number, roomType: RoomType, reservationId: number, people: Guest[]): Reservation | undefined {
     const reservationToAdd: Reservation = {
         id: reservationId,
-        checkIn: new Date(references.GetInput("check-in")!.current?.value!),
-        checkOut: new Date(references.GetInput("check-out")!.current?.value!),
+        checkIn: MapDateOnly(references.GetInput("check-in")!.current?.value!),
+        checkOut: MapDateOnly(references.GetInput("check-out")!.current?.value!),
         flightArrivalNumber: references.GetInput("flight-arrival-number")!.current?.value!,
         flightDepartureNumber: references.GetInput("flight-departure-number")!.current?.value!,
-        flightArrivalTime: new Date(references.GetInput("flight-arrival-time")!.current?.value!),
-        flightDepartureTime: new Date(references.GetInput("flight-departure-time")!.current?.value!),
+        flightArrivalTime: MapTimeOnly(references.GetInput("flight-arrival-time")!.current?.value),
+        flightDepartureTime: MapTimeOnly(references.GetInput("flight-departure-time")!.current?.value),
         bookingSource: BookingSource[references.GetSelect("booking-source")!.current?.value! as keyof typeof BookingSource],
         remarks: references.GetInput("remarks")!.current?.value!,
 
