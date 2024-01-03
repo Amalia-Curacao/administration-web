@@ -5,16 +5,16 @@ import RoomType from "../../models/RoomType";
 import { MdBedroomParent } from "react-icons/md";
 import Cells from "./cells";
 
-export default function Tables({rooms, monthYear, showDates}: {rooms: Room[], monthYear: Date, showDates: boolean}): ReactElement {
+export default function Tables({rooms, monthYear, showDates: roundedEdges}: {rooms: Room[], monthYear: Date, showDates: boolean}): ReactElement {
     if(rooms.length === 0) return(<Fragment/>);
     return(<>
         <table className="table table-borderless mt-0 mb-0">
             <thead>
-                <tr hidden={!showDates}>
-                    <td className="flipped" style={{fontSize:"16px", borderRadius: "5px 0px 0px 0px"}}>
+                <tr>
+                    <td className="flipped" style={{fontSize:"16px", borderRadius: (roundedEdges ? "5px 0px 0px 0px" : "0px")}}>
                         <MdBedroomParent/>
                     </td>                            
-                    <Dates monthYear={monthYear}/>   
+                    <Dates roundedEdges={roundedEdges} monthYear={monthYear}/>   
                 </tr> 
                 <tr>
                     <th colSpan={2} className="pb-0 pt-0 align-middle">
@@ -33,7 +33,7 @@ export default function Tables({rooms, monthYear, showDates}: {rooms: Room[], mo
     </>);
 }
 
-function Dates({monthYear}: {monthYear: Date}): ReactElement {
+function Dates({monthYear, roundedEdges}: {monthYear: Date, roundedEdges: boolean}): ReactElement {
     const totalAmountOfdays = new Date(monthYear.getFullYear(), monthYear.getMonth() + 1, 0).getDate();
     let days: ReactElement[] = [];
     for(let i = 1; i <= totalAmountOfdays; i++) days.push(<Day key={i} day={i}/>);
@@ -43,7 +43,7 @@ function Dates({monthYear}: {monthYear: Date}): ReactElement {
         const date = new Date(monthYear.getFullYear(), monthYear.getMonth(), day);
         const cellClass = "d-flex flex-fill justify-content-center flex-column darken-on-hover p-2 bg-primary text-secondary";
         const colorClass = isSameDay(date, new Date()) ? " " : (date < new Date() ? " past" : " ") ;
-        const borderRadius = totalAmountOfdays === day ? "0px 5px 0px 0px" : "0px";
+        const borderRadius = roundedEdges && totalAmountOfdays === day ? "0px 5px 0px 0px" : "0px";
 
         return(<td style={{borderRadius: borderRadius}} className={cellClass + colorClass}>
             <span className="d-flex justify-content-center">

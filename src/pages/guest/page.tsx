@@ -25,22 +25,11 @@ function Validate(guest: Guest): boolean{
     let isValid: boolean = true;
     
     const nullErrorMessage: string = "Required";
-    if(!guest.firstName || guest.firstName === "") {
-        references.GetSpan("first-name-validation")!.current!.innerText = nullErrorMessage;
-        references.GetDiv("first-name-wrapper")!.current!.classList.add("border-danger");
-        isValid = false;
-    };
     if(!guest.lastName || guest.lastName === "") {
         references.GetSpan("last-name-validation")!.current!.innerText = nullErrorMessage;
         references.GetDiv("last-name-wrapper")!.current!.classList.add("border-danger");
         isValid = false;
     };
-
-    if(guest.age! <= 0) {
-        references.GetSpan("age-validation")!.current!.innerText = "Age cannot be negative or empty";
-        references.GetDiv("age-wrapper")!.current!.classList.add("border-danger");
-        isValid = false;
-    }
 
     return (isValid);
 }
