@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/cd8fb906-945c-452c-80e1-68a1c2205bdc/resourceGroups/amalia-rsc/providers/Microsoft.Web/sites/amalia-web",
+    "appService.deploySubpath": "build"
+}
