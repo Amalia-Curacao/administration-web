@@ -166,12 +166,6 @@ function Validate(reservation: Reservation): boolean {
         references.GetDiv("check-out-wrapper")!.current!.classList.add("border-danger");
         isValid = false;
     };
-    
-    if(reservation.bookingSource === BookingSource.None) {
-        references.GetSpan("booking-source-validation")!.current!.innerText = "Bookingsource cannot be none.";
-        references.GetDiv("booking-source-wrapper")!.current!.classList.add("border-danger");
-        isValid = false;
-    }
 
     if(reservation.checkIn! > reservation.checkOut!) {
         references.GetSpan("check-in-validation")!.current!.innerText = "Check in cannot be after check out.";
