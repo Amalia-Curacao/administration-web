@@ -32,7 +32,7 @@ function RoomIndexBody(): ReactElement {
         </div>
         <div className="p-3 pb-0 d-flex flex-column flex-fill">
             {Object.keys(groupedRooms).map((key, index) => 
-                <Rooms key={index} monthYear={monthYear} showDates={index === 0} rooms={groupedRooms[key]}/>)}
+                <Rooms key={index} monthYear={monthYear} roundedEdges={index === 0} rooms={groupedRooms[key]} allRooms={rooms}/>)}
             <div className="table-end" style={{borderRadius:"0 0 5px 5px"}}/>
         </div>
     </>);
