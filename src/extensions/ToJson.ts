@@ -25,7 +25,7 @@ export function ToJsonReservation(reservation: Reservation): any{
         guests: undefined,
         checkIn: !reservation.checkIn ? undefined : toJsonDateOnly(reservation.checkIn), 
         checkOut: !reservation.checkOut ? undefined : toJsonDateOnly(reservation.checkOut),
-        room: reservation.room,
+        room: undefined,
         roomNumber: reservation.roomNumber,
         roomType: ToJsonRoomType(reservation.roomType!), 
         bookingSource: ToJsonBookingSource(reservation.bookingSource!),
@@ -33,7 +33,7 @@ export function ToJsonReservation(reservation: Reservation): any{
         flightArrivalTime: !reservation.flightArrivalTime ? undefined : toJsonTimeOnly(reservation.flightArrivalTime),
         flightDepartureNumber: reservation.flightDepartureNumber,
         flightDepartureTime: !reservation.flightDepartureTime ? undefined : toJsonTimeOnly(reservation.flightDepartureTime),
-        schedule: reservation.schedule,
+        schedule: undefined,
         scheduleId: reservation.scheduleId,
         remarks: reservation.remarks,
     };
@@ -63,7 +63,6 @@ export function ToJsonRoomType(roomType: RoomType): number{
 }
 
 export function ToJsonBookingSource(bookingSource: BookingSource): number{
-    console.log(bookingSource);
     switch(bookingSource){
         case BookingSource.None:
             return 0;

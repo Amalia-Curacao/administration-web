@@ -7,7 +7,7 @@ import axios from "axios";
 import { ToJsonGuest, ToJsonReservation } from "../../extensions/ToJson";
 import { useNavigate } from "react-router-dom";
 
-export default function Cells({room, monthYear}: {room: Room, monthYear: Date}): ReactElement{
+export default function Cells({room, rooms, monthYear}: {room: Room, rooms: Room[], monthYear: Date}): ReactElement{
     const navigation = useNavigate();
     const amount = new Date(monthYear.getFullYear(), monthYear.getMonth() + 1, 0).getDate();
     const reservations = room.reservations ?? [];
@@ -16,12 +16,12 @@ export default function Cells({room, monthYear}: {room: Room, monthYear: Date}):
     for(let day = 1; day <= amount; day++) {
         const current: Date = new Date(monthYear.getFullYear(), monthYear.getMonth(), day);
         const occupy: Reservation[] =  reservations.filter(r => (r.checkIn! <= current) && (r.checkOut! >= current));
-        const addReservationCell = (shape: string): ReactElement => {return(<EmptyCell room={room} currentDate={current} shape={shape} onAdd={onAdd}/>)};
+        const addReservationCell = (shape: string): ReactElement => {return(<EmptyCell room={room} rooms={rooms} currentDate={current} shape={shape} onAdd={onAdd}/>)};
 
         days.push(<td style={{overflow:"hidden"}} key={day} className={"p-0 d-flex flex-fill cell" + (day % 2 === 0 ? " darken " : "")}>
                 {occupy.length === 0
                     ? addReservationCell("")
-                    : <Cell occupy={occupy} current={current} onDelete={onDelete} onUpdate={onUpdate} emptyCell={addReservationCell}/>}
+                    : <Cell rooms={rooms} occupy={occupy} current={current} onDelete={onDelete} onUpdate={onUpdate} emptyCell={addReservationCell}/>}
             </td>);
     }
 
@@ -30,7 +30,7 @@ export default function Cells({room, monthYear}: {room: Room, monthYear: Date}):
     </tr>);
 
     function onUpdate(reservation: Reservation): void {
-        reservation = {...reservation, roomNumber: room.number, roomType: room.type, roomScheduleId: room.scheduleId, scheduleId: room.scheduleId }
+        reservation = {...reservation, roomType: room.type, roomScheduleId: room.scheduleId, scheduleId: room.scheduleId }
         axios.post(process.env.REACT_APP_API_URL + "/Reservations/Edit", ToJsonReservation(reservation)).then(() => {
             axios.put(process.env.REACT_APP_API_URL + "/Guest/Set/" + reservation.id, reservation.guests!.map(ToJsonGuest))
             .catch(err => {console.log(err)});
@@ -57,23 +57,23 @@ export default function Cells({room, monthYear}: {room: Room, monthYear: Date}):
 }
 
 // occupy should not is not empty
-export function Cell({occupy, current, onUpdate, onDelete, emptyCell}: {occupy: Reservation[], current: Date, onUpdate: (r: Reservation) => void, onDelete: (r: Reservation) => void, emptyCell: (shape: string) => ReactElement}): ReactElement {
+export function Cell({occupy, current, rooms, onUpdate, onDelete, emptyCell}: {occupy: Reservation[], current: Date, rooms: Room[], onUpdate: (r: Reservation) => void, onDelete: (r: Reservation) => void, emptyCell: (shape: string) => ReactElement}): ReactElement {
     const [checkIn, setCheckIn] = useState<Reservation | undefined>(occupy.find(r => isSameDay(r.checkIn!, current)));
     const [checkOut, setCheckOut] = useState<Reservation | undefined>(occupy.find(r => isSameDay(r.checkOut!, current)));
     switch(true) {
         case checkIn !== undefined && checkOut !== undefined: return(<>
-            <CheckOutCell onSave={updateCheckOut} reservation={checkOut!}/>
-            <CheckInCell onSave={updateCheckIn} reservation={checkIn!}/>
+            <CheckOutCell rooms={rooms} onSave={updateCheckOut} reservation={checkOut!}/>
+            <CheckInCell rooms={rooms} onSave={updateCheckIn} reservation={checkIn!}/>
         </>);
         case checkIn !== undefined: return(<>
             {emptyCell("L")}
-            <CheckInCell onSave={updateCheckIn} reservation={checkIn!}/>
+            <CheckInCell rooms={rooms} onSave={updateCheckIn} reservation={checkIn!}/>
         </>);
         case checkOut !== undefined: return(<>
-            <CheckOutCell onSave={updateCheckOut} reservation={checkOut!}/>
+            <CheckOutCell rooms={rooms} onSave={updateCheckOut} reservation={checkOut!}/>
             {emptyCell("R")}
         </>);
-        default: return <OccupiedCell onSave={updateOccupy} reservation={occupy[0]} currentDate={current}/>;
+        default: return <OccupiedCell rooms={rooms} onSave={updateOccupy} reservation={occupy[0]} currentDate={current}/>;
     }    
 
     function updateCheckIn(reservation: Reservation | undefined): void {
@@ -88,40 +88,40 @@ export function Cell({occupy, current, onUpdate, onDelete, emptyCell}: {occupy: 
     }
     function updateOccupy(reservation: Reservation | undefined): void {
         reservation !== undefined 
-            ? onUpdate(reservation!) 
+            ? onUpdate(reservation) 
             : onDelete(occupy[0]);
     }
 }
 
-export function CheckInCell({reservation, onSave}: {reservation: Reservation, onSave: (r: Reservation | undefined) => void}): ReactElement{
+export function CheckInCell({reservation, rooms, onSave}: {reservation: Reservation, rooms: Room[], onSave: (r: Reservation | undefined) => void}): ReactElement{
     // TODO migrate on level lower
     const [modal, setModal] = useState<boolean>(false);
     const button: ReactElement = <button onClick={() => setModal(!modal)} style={{marginLeft: "-50%"}} className="flex-fill check-in no-decoration"></button>;
     
     return(<>
         {button}
-        <ReservationModal show={modal} setShow={(b: boolean) => setModal(b)} reservation={reservation} onSave={onSave}/>
+        <ReservationModal rooms={rooms} show={modal} setShow={(b: boolean) => setModal(b)} reservation={reservation} onSave={onSave}/>
     </>);
 }
 
-export function CheckOutCell({reservation, onSave}: {reservation: Reservation, onSave: (r: Reservation | undefined) => void}): ReactElement{
+export function CheckOutCell({reservation, rooms, onSave}: {reservation: Reservation, rooms: Room[], onSave: (r: Reservation | undefined) => void}): ReactElement{
     const [modal, setModal] = useState<boolean>(false);
     const button: ReactElement = <button onClick={() => setModal(!modal)} style={{marginRight: "-50%"}} className="flex-fill check-out no-decoration"></button>;
     
     return(<>
         {button}
-        <ReservationModal show={modal} setShow={(b: boolean) => setModal(b)} reservation={reservation} onSave={onSave}/>
+        <ReservationModal rooms={rooms} show={modal} setShow={(b: boolean) => setModal(b)} reservation={reservation} onSave={onSave}/>
     </>);
 }
 
-export function OccupiedCell({reservation, currentDate, onSave}: {reservation: Reservation, currentDate: Date, onSave: (r: Reservation | undefined) => void}): ReactElement{
+export function OccupiedCell({reservation, rooms, currentDate, onSave}: {reservation: Reservation, rooms: Room[], currentDate: Date, onSave: (r: Reservation | undefined) => void}): ReactElement{
     const [modal, setModal] = useState<boolean>(false);
     const button: ReactElement = <button onClick={() => setModal(!modal)} className="flex-fill occupied no-decoration">{
         GuestName(reservation!, currentDate)}</button>;
 
     return(<>
         {button}
-        <ReservationModal show={modal} setShow={(b: boolean) => setModal(b)} reservation={reservation} onSave={onSave}/>
+        <ReservationModal rooms={rooms} show={modal} setShow={(b: boolean) => setModal(b)} reservation={reservation} onSave={onSave}/>
     </>);
 
     function GuestName(occupied: Reservation, currentDate: Date) : ReactElement {
@@ -139,7 +139,7 @@ export function OccupiedCell({reservation, currentDate, onSave}: {reservation: R
     } 
 }
 
-export function EmptyCell({shape, room, currentDate, onAdd}: {shape: string, room: Room, currentDate: Date, onAdd: (r: Reservation) => void}): ReactElement{
+export function EmptyCell({shape, room, rooms, currentDate, onAdd}: {shape: string, room: Room, rooms: Room[], currentDate: Date, onAdd: (r: Reservation) => void}): ReactElement{
     const [modal, setModal] = useState<boolean>(false);
     function onClick(): void{
         setModal(!modal);
@@ -162,6 +162,6 @@ export function EmptyCell({shape, room, currentDate, onAdd}: {shape: string, roo
 
     return(<>
         {button()} 
-        <CreateReservationModal onSave={onAdd} setShow={setShow} show={modal} checkIn={currentDate} room={room} />
+        <CreateReservationModal rooms={rooms} onSave={onAdd} setShow={setShow} show={modal} checkIn={currentDate} room={room} />
     </>);
 }

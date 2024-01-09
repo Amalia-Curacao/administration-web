@@ -9,10 +9,7 @@ import Room from "../../models/Room";
 import {default as GuestPage} from "../guest/page";
 import {default as ReservationPage} from "../reservation/page";
 
-// TODO update the reservations in the rooms to update UI.
-// TODO there is a bug where the second guest does not get added to the reservation.
-
-export function CreateReservationModal({checkIn, room, show, setShow, onSave}: {checkIn: Date, room: Room, show: boolean, setShow: (b: boolean) => void, onSave: (r: Reservation) => void}): ReactElement {
+export function CreateReservationModal({checkIn, room, rooms, show, setShow, onSave}: {checkIn: Date, room: Room, rooms: Room[], show: boolean, setShow: (b: boolean) => void, onSave: (r: Reservation) => void}): ReactElement {
     const blankReservation: Reservation = {
         id: -1,
         checkIn: checkIn,
@@ -32,13 +29,13 @@ export function CreateReservationModal({checkIn, room, show, setShow, onSave}: {
         guests: []
     };
 
-    return(<ReservationModal show={show} setShow={setShow} reservation={blankReservation} onSave={(r: Reservation | undefined) => onSave(r!)}/>);
+    return(<ReservationModal show={show} setShow={setShow} reservation={blankReservation} rooms={rooms} onSave={(r: Reservation | undefined) => onSave(r!)}/>);
 }
 
-export default function ReservationModal({reservation, onSave, show, setShow}: {reservation: Reservation, onSave: (r: Reservation | undefined) => void, show: boolean, setShow: (s: boolean) => void}): ReactElement {
+export default function ReservationModal({reservation, onSave, show, setShow, rooms}: {reservation: Reservation, onSave: (r: Reservation | undefined) => void, show: boolean, setShow: (s: boolean) => void, rooms: Room[]}): ReactElement {
     const [tempReservation, setTempReservation] = useState<Reservation>({...reservation, guests: reservation.guests ?? []});
     const [showGuest, setShowGuest] = useState<{[index: number]: boolean}>({});
-    const reservationPage = ReservationPage(tempReservation);
+    const reservationPage = ReservationPage(tempReservation, rooms);
     const toReservationModal = (): void => { 
         Object.keys(showGuest).forEach(key => setShowGuest(showGuest => ({...showGuest, [key]: false})));
         setShow(true);

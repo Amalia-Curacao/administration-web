@@ -5,7 +5,7 @@ import RoomType from "../../models/RoomType";
 import { MdBedroomParent } from "react-icons/md";
 import Cells from "./cells";
 
-export default function Tables({rooms, monthYear, showDates: roundedEdges}: {rooms: Room[], monthYear: Date, showDates: boolean}): ReactElement {
+export default function Tables({rooms, monthYear, roundedEdges, allRooms}: {rooms: Room[], monthYear: Date, roundedEdges: boolean, allRooms: Room[]}): ReactElement {
     if(rooms.length === 0) return(<Fragment/>);
     return(<>
         <table className="table table-borderless mt-0 mb-0">
@@ -26,7 +26,7 @@ export default function Tables({rooms, monthYear, showDates: roundedEdges}: {roo
                 {rooms.map((r, index) => 
                 <tr style={{overflow:"visible"}} className="darken-on-hover" key={index}>
                     <td className="flipped text-center">{r.number}</td>
-                    <Cells key={index} monthYear={monthYear} room={r}/>
+                    <Cells rooms={allRooms} key={index} monthYear={monthYear} room={r}/>
                 </tr>)}
             </tbody>
         </table>
