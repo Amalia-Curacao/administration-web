@@ -1,13 +1,11 @@
-import axios from "axios";
 import { ReactElement, useState } from "react";
 import { Modal } from "react-bootstrap";
 import BookingSource from "../../models/BookingSource";
 import Guest from "../../models/Guest";
-import PersonPrefix from "../../models/PersonPrefix";
 import Reservation from "../../models/Reservation";
 import Room from "../../models/Room";
-import {default as GuestPage} from "../guest/page";
-import {default as ReservationPage} from "../reservation/page";
+import ReservationPage from "./page";
+import GuestModal, { CreateGuestModal} from "../guest/modal";
 
 export function CreateReservationModal({checkIn, room, rooms, show, setShow, onSave}: {checkIn: Date, room: Room, rooms: Room[], show: boolean, setShow: (b: boolean) => void, onSave: (r: Reservation) => void}): ReactElement {
     const blankReservation: Reservation = {
@@ -36,6 +34,7 @@ export default function ReservationModal({reservation, onSave, show, setShow, ro
     const [tempReservation, setTempReservation] = useState<Reservation>({...reservation, guests: reservation.guests ?? []});
     const [showGuest, setShowGuest] = useState<{[index: number]: boolean}>({});
     const reservationPage = ReservationPage(tempReservation, rooms);
+
     const toReservationModal = (): void => { 
         Object.keys(showGuest).forEach(key => setShowGuest(showGuest => ({...showGuest, [key]: false})));
         setShow(true);
@@ -56,18 +55,17 @@ export default function ReservationModal({reservation, onSave, show, setShow, ro
        setShow(false);
     }
     const onRemoveGuest = (guest: Guest): void => {
-        if(tempReservation.id! > -1) axios.delete(process.env.REACT_APP_API_URL + "/Guest/Delete/" + guest.id);
-        setTempReservation({...tempReservation, guests: tempReservation.guests!.filter(p => p.id !== guest.id)});
+        const listWithoutGuest = tempReservation.guests!.filter(g => g.id !== guest.id);
+        const guests = listWithoutGuest!.map(g => g.id! >= 0 ? g : {...g, id: -listWithoutGuest.length});
+        setTempReservation({...tempReservation, guests: guests});
         toReservationModal();
     }
-
     const onSaveGuest = (guest: Guest): void => {
         if(!guest) return;
-        const guestIndex = tempReservation.guests!.findIndex(p => p.id === guest.id && p.id !== -1);
-        const newGuests = guestIndex !== -1 
-            ? tempReservation.guests!.map((g, index) => index === guestIndex ? guest : g)
-            : [...tempReservation.guests!, guest];
-        setTempReservation({...tempReservation, guests: newGuests});
+        const guests = tempReservation.guests?.findIndex(g => g.id === guest.id) === -1 
+            ? [...tempReservation.guests, guest] 
+            : tempReservation.guests!.map(g => g.id === guest.id ? guest : g);
+        setTempReservation({...tempReservation, guests: guests});
         toReservationModal();
     }
 
@@ -79,8 +77,8 @@ export default function ReservationModal({reservation, onSave, show, setShow, ro
             <Modal.Footer style={{borderRadius: "0px 0px 5px 5px"}} className="bg-primary">
                 <div className="flex flex-fill pe-3 ps-3">
                     <div className="float-start btn-group">
-                        {tempReservation.guests!.map((p, index) => 
-                            <button key={index} className="btn btn-secondary hover-success" onClick={() => toGuestModal(index)}>{p.firstName}</button>)}
+                        {tempReservation.guests!.map((guest, index) => 
+                            <button key={index} className="btn btn-secondary hover-success" onClick={() => toGuestModal(index)}>{guest.firstName}</button>)}
                         {tempReservation.guests!.length < 2 
                             ? (<button className="btn btn-secondary hover-success float-start" 
                                 onClick={() => toGuestModal(tempReservation.guests!.length)}>Add guest</button>) 
@@ -101,38 +99,4 @@ export default function ReservationModal({reservation, onSave, show, setShow, ro
         <CreateGuestModal onSave={onSaveGuest} reservation={tempReservation} onClose={toReservationModal} onRemove={onRemoveGuest}
             show={showGuest[tempReservation.guests!.length] ?? (showGuest[tempReservation.guests!.length] = false)}/>
     </>);
-}
-
-function GuestModal({show, guest, onClose, onSave, onRemove}: {show: boolean, guest: Guest, onClose: VoidFunction, onSave: (g: Guest) => void, onRemove: (g: Guest) => void}): ReactElement {
-    const guestPage = GuestPage(guest);
-    
-    return(<>
-        <Modal show={show} onHide={onClose}>
-            <Modal.Body style={{borderRadius: "5px 5px 0px 0px"}} className="bg-primary">
-                {guestPage.body}
-            </Modal.Body>
-            <Modal.Footer style={{borderRadius: "0px 0px 5px 5px"}} className="bg-primary">
-                <div className="btn-group">
-                    <button className="btn btn-secondary hover-danger" onClick={() => {if(guestPage.action() !== undefined) onRemove(guestPage.action()!)}}>Delete</button>
-                    <button className="btn btn-secondary hover-success" onClick={() => {if(guestPage.action() !== undefined) onSave(guestPage.action()!)}}>Save</button>
-                </div>
-            </Modal.Footer>
-        </Modal>
-    </>);
-}
-
-function CreateGuestModal({show, reservation, onClose, onSave, onRemove}: {show: boolean, reservation: Reservation, onClose: VoidFunction, onSave: (g: Guest) => void, onRemove: (g: Guest) => void}): ReactElement {
-    const blankGuest: Guest = {
-        // The negative Id ensures that the backend creates a new id automatically when creating a new guest.
-        // The -1 at the end ensures that when a guest is added for the first time the id is -1 instead of 0.
-        id: -reservation.guests!.length - 1,
-        firstName: undefined,
-        lastName: undefined,
-        prefix: PersonPrefix.Unknown,
-        reservationId: reservation.id,
-        reservation: reservation,
-        note: "",
-        age: undefined,
-    };
-    return(<GuestModal guest={blankGuest} onClose={onClose} show={show} onSave={onSave} onRemove={onRemove}/>);
 }

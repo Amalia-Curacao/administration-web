@@ -2,7 +2,7 @@ import { ReactElement, useState, Fragment } from "react";
 import { isSameDay, oldest } from "../../extensions/Date";
 import Reservation from "../../models/Reservation";
 import Room from "../../models/Room";
-import ReservationModal, { CreateReservationModal} from "./modal";
+import ReservationModal, {CreateReservationModal} from "../reservation/modal";
 import axios from "axios";
 import { ToJsonGuest, ToJsonReservation } from "../../extensions/ToJson";
 import { useNavigate } from "react-router-dom";
