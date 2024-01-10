@@ -7,7 +7,7 @@ import axios from "axios";
 import { ToJsonGuest, ToJsonReservation } from "../../extensions/ToJson";
 import { useNavigate } from "react-router-dom";
 
-export default function Cells({room, rooms, monthYear}: {room: Room, rooms: Room[], monthYear: Date}): ReactElement{
+export default function Cells({room, rooms, monthYear, housekeeping}: {room: Room, rooms: Room[], monthYear: Date, housekeeping: boolean}): ReactElement{
     const navigation = useNavigate();
     const amount = new Date(monthYear.getFullYear(), monthYear.getMonth() + 1, 0).getDate();
     const reservations = room.reservations ?? [];
@@ -21,7 +21,7 @@ export default function Cells({room, rooms, monthYear}: {room: Room, rooms: Room
         days.push(<td style={{overflow:"hidden"}} key={day} className={"p-0 d-flex flex-fill cell" + (day % 2 === 0 ? " darken " : "")}>
                 {occupy.length === 0
                     ? addReservationCell("")
-                    : <Cell rooms={rooms} occupy={occupy} current={current} onDelete={onDelete} onUpdate={onUpdate} emptyCell={addReservationCell}/>}
+                    : <Cell housekeeping={housekeeping} rooms={rooms} occupy={occupy} current={current} onDelete={onDelete} onUpdate={onUpdate} emptyCell={addReservationCell}/>}
             </td>);
     }
 
@@ -57,7 +57,7 @@ export default function Cells({room, rooms, monthYear}: {room: Room, rooms: Room
 }
 
 // occupy should not is not empty
-export function Cell({occupy, current, rooms, onUpdate, onDelete, emptyCell}: {occupy: Reservation[], current: Date, rooms: Room[], onUpdate: (r: Reservation) => void, onDelete: (r: Reservation) => void, emptyCell: (shape: string) => ReactElement}): ReactElement {
+export function Cell({occupy, current, rooms, housekeeping, onUpdate, onDelete, emptyCell}: {occupy: Reservation[], current: Date, rooms: Room[], housekeeping: boolean, onUpdate: (r: Reservation) => void, onDelete: (r: Reservation) => void, emptyCell: (shape: string) => ReactElement}): ReactElement {
     const [checkIn, setCheckIn] = useState<Reservation | undefined>(occupy.find(r => isSameDay(r.checkIn!, current)));
     const [checkOut, setCheckOut] = useState<Reservation | undefined>(occupy.find(r => isSameDay(r.checkOut!, current)));
     switch(true) {
@@ -73,7 +73,7 @@ export function Cell({occupy, current, rooms, onUpdate, onDelete, emptyCell}: {o
             <CheckOutCell rooms={rooms} onSave={updateCheckOut} reservation={checkOut!}/>
             {emptyCell("R")}
         </>);
-        default: return <OccupiedCell rooms={rooms} onSave={updateOccupy} reservation={occupy[0]} currentDate={current}/>;
+        default: return <OccupiedCell housekeeping={housekeeping} rooms={rooms} onSave={updateOccupy} reservation={occupy[0]} currentDate={current}/>;
     }    
 
     function updateCheckIn(reservation: Reservation | undefined): void {
@@ -114,7 +114,7 @@ export function CheckOutCell({reservation, rooms, onSave}: {reservation: Reserva
     </>);
 }
 
-export function OccupiedCell({reservation, rooms, currentDate, onSave}: {reservation: Reservation, rooms: Room[], currentDate: Date, onSave: (r: Reservation | undefined) => void}): ReactElement{
+export function OccupiedCell({reservation, rooms, currentDate, housekeeping, onSave}: {reservation: Reservation, rooms: Room[], currentDate: Date, housekeeping: boolean, onSave: (r: Reservation | undefined) => void}): ReactElement{
     const [modal, setModal] = useState<boolean>(false);
     const button: ReactElement = <button onClick={() => setModal(!modal)} className="flex-fill occupied no-decoration">{
         GuestName(reservation!, currentDate)}</button>;
@@ -131,7 +131,7 @@ export function OccupiedCell({reservation, rooms, currentDate, onSave}: {reserva
         if(isSameDay(currentDate, oldest(beginingOfMonth, dayAfterCheckIn)))
             {   
                 return(<span className="guest-name">
-                    {occupied.guests!.length > 0
+                    {occupied.guests!.length > 0 && !housekeeping
                         ? occupied.guests![0].lastName!
                         : "" }
                 </span>);}

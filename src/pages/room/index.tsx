@@ -1,22 +1,23 @@
-import { ReactElement, useEffect, useState } from "react";
+import { Fragment, ReactElement, useEffect, useState } from "react";
 import "../../scss/room.table.scss";
 import { MdBedroomParent } from "react-icons/md";
 import PageLink from "../../types/PageLink";
 import Room from "../../models/Room";
 import RoomType from "../../models/RoomType";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { FaLongArrowAltLeft, FaLongArrowAltRight } from "react-icons/fa";
 import axios from "axios";
 import {default as Rooms} from "./table";
 import {MapAll as MapRooms} from "../../mapping/room";
+import { pages } from "../../routes";
 
 const _info = {name: "Rooms", icon: <MdBedroomParent/>};
 
 function RoomIndexBody(): ReactElement {
-    const { id } = useParams();
+    const { id, viewMode } = useParams();
     if(!id) throw new Error("Schedule ID is undefined.");
-    const [monthYear, setMonthYear] = useState(new Date()); // [1, 12]
     const [rooms, setRooms] = useState<Room[]>([]);
+
     useEffect(() => {
         axios.get(process.env.REACT_APP_API_URL + "/Rooms/Get/" + id)
         .then(async response => {
@@ -25,14 +26,22 @@ function RoomIndexBody(): ReactElement {
         .catch(error => console.log(error));
     }, [id]);
 
+    const navigate = useNavigate();
+    const [monthYear, setMonthYear] = useState(new Date());
     const groupedRooms = groupByRoomType(rooms);
+
     return(<>
-        <div style={{borderRadius:"5px"}} className="p-3 m-3 mb-2 bg-primary d-flex flex-fill flex-row">
-            <MonthYearSelector monthYear={monthYear} onChange={onMonthYearSelected}/>
-        </div>
+        {viewMode !== "housekeeping"  
+            ?   <>
+                <div style={{borderRadius:"5px" }} className="p-3 m-3 mb-2 bg-primary d-flex flex-fill flex-row">
+                    <MonthYearSelector monthYear={monthYear} onChange={onMonthYearSelected}/>
+                    <button onClick={() => navigate(pages["room index"].route + "/" + id + "/housekeeping")} className="btn btn-secondary btn-outline-primary float-end">Housekeeping</button>
+                </div>
+                </>
+            :   <Fragment/>}
         <div className="p-3 pb-0 d-flex flex-column flex-fill">
             {Object.keys(groupedRooms).map((key, index) => 
-                <Rooms key={index} monthYear={monthYear} roundedEdges={index === 0} rooms={groupedRooms[key]} allRooms={rooms}/>)}
+                <Rooms key={index} monthYear={monthYear} roundedEdges={index === 0} rooms={groupedRooms[key]} allRooms={rooms} housekeeping={viewMode === "housekeeping"}/>)}
             <div className="table-end" style={{borderRadius:"0 0 5px 5px"}}/>
         </div>
     </>);
@@ -42,9 +51,9 @@ function RoomIndexBody(): ReactElement {
     }
 }
 
-function MonthYearSelector({monthYear, onChange}: {monthYear: Date, onChange: (monthYear: Date) => void}): ReactElement {
+function MonthYearSelector({monthYear, onChange}: {monthYear: Date, onChange: (monthYear: Date) => void }): ReactElement {
     const arrowClass = "me-2 justify-content-center align-content-middle no-decoration bg-primary";
-    return(<>
+    return(
         <div className="d-flex flex-fill flex-row justify-content-center align-items-center">
             <button className={arrowClass} onClick={() => onChange(new Date(monthYear.getFullYear(), monthYear.getMonth() - 1, 1))}>
                 <FaLongArrowAltLeft size={32} className="text-secondary"/>
@@ -53,8 +62,7 @@ function MonthYearSelector({monthYear, onChange}: {monthYear: Date, onChange: (m
             <button className={arrowClass} onClick={() => onChange(new Date(monthYear.getFullYear(), monthYear.getMonth() + 1, 1))}>
                 <FaLongArrowAltRight size={32} className="text-secondary i-l"/>
             </button>
-        </div>
-    </>);
+        </div>);
 }
 
 // #region Functions
@@ -74,5 +82,5 @@ export const link: PageLink = {
     icon: _info.icon,
     route: '/room',
     element: <RoomIndexBody/>,
-    params: '/:id'
+    params: '/:id/:viewMode?'
 };
