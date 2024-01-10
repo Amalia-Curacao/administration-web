@@ -1,13 +1,13 @@
 import { ReactElement } from "react";
 import Reservation from "../../models/Reservation";
-import BookingSource from "../../models/BookingSource";
 import "../../scss/reservation.create.scss";
 import References from "../../tools/References";
 import InputField from "../../components/inputField";
+import Room from "../../models/Room";
+import BookingSource from "../../models/BookingSource";
 import { toJsonDateOnly, toJsonTimeOnly } from "../../extensions/ToJson";
 import { default as MapTimeOnly } from "../../mapping/timeonly";
 import { default as MapDateOnly } from "../../mapping/dateonly";
-import Room from "../../models/Room";
 
 const references: References = new References();
 
@@ -57,19 +57,19 @@ function Body({reservation}: {reservation: Reservation}): ReactElement {
                             </InputField>
                         </label>
                     </td>
-                    <td className="bg-primary text-secondary text-nowrap">
-                        <label className="w-100">Flight Departure Number
-                            <InputField refKey="flight-departure-number" references={references}>
-                                <input onChange={updateFlightDepartureNumber} defaultValue={reservation.flightDepartureNumber ? reservation.flightDepartureNumber : ""} ref={references.GetInput("flight-departure-number")} type="text" className="form-control"/>
+                    <td className="bg-primary text-secondary">
+                        <label className="w-100">Flight Arrival Time
+                            <InputField refKey="flight-arrival-time" references={references}>
+                                <input onChange={updateFlightArrivalTime} defaultValue={!reservation.flightArrivalTime ? "" : toJsonTimeOnly(reservation.flightArrivalTime!).split(':').slice(0, 2).join(':')} ref={references.GetInput("flight-arrival-time")} type="time" className="form-control"/>
                             </InputField>
                         </label>
                     </td>
                 </tr>
                 <tr>
-                    <td className="bg-primary text-secondary">
-                        <label className="w-100">Flight Arrival Time
-                            <InputField refKey="flight-arrival-time" references={references}>
-                                <input onChange={updateFlightArrivalTime} defaultValue={!reservation.flightArrivalTime ? "" : toJsonTimeOnly(reservation.flightArrivalTime!).split(':').slice(0, 2).join(':')} ref={references.GetInput("flight-arrival-time")} type="time" className="form-control"/>
+                    <td className="bg-primary text-secondary text-nowrap">
+                        <label className="w-100">Flight Departure Number
+                            <InputField refKey="flight-departure-number" references={references}>
+                                <input onChange={updateFlightDepartureNumber} defaultValue={reservation.flightDepartureNumber ? reservation.flightDepartureNumber : ""} ref={references.GetInput("flight-departure-number")} type="text" className="form-control"/>
                             </InputField>
                         </label>
                     </td>
