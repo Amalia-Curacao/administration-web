@@ -7,6 +7,7 @@ $occupied: #F7F1A6;
 $darken-percentage: 5%;
 $dark-check-in: darken($check-in, $darken-percentage);
 $dark-check-out: darken($check-out, $darken-percentage);
+$dark-occupied: darken($occupied, $darken-percentage);
 $dark-secondary: darken($secondary, $darken-percentage);
 $dark-primary: darken($primary, $darken-percentage);
 $cell-height: 40px;
@@ -90,18 +91,18 @@ button.hover-danger:hover{
 }
 
 .darken > .occupied{
-    background-color: darken($occupied, $darken-percentage) !important;
+    background-color: $dark-occupied !important;
 }
 
 .darken > .check-in{
-    background: darken($check-in, $darken-percentage) !important;
+    background: $dark-check-in !important;
 }
 
 .darken > .check-out{
-    background: darken($check-out, $darken-percentage) !important;
+    background: $dark-check-out !important;
 }
 
 .darken > button{
-    background-color: darken($secondary, $darken-percentage) !important;
+    background-color: $dark-secondary !important;
 }
 // #endregion
