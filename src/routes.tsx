@@ -13,17 +13,17 @@ export const defaultPage: PageLink = {
 }
 
 
-export const routes: { [id: string]: PageLink; } = {
+export const pages: { [id: string]: PageLink; } = {
     "default": defaultPage,
     "schedule index": SchedulesLink,
-    "room index": RoomsLink
+    "room index": RoomsLink,
 };
 
 export default function RouteObjects(): RouteObject[] {
-    return (Object.values(routes).map((route) => {
+    return (Object.values(pages).map(page => {
         return {
-            path: route.route + (route.params ?? ""),
-            element: route.element,
+            path: page.route + (page.params ?? ""),
+            element: page.element,
             replace: true,
         };
     }));
