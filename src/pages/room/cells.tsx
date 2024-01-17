@@ -32,7 +32,7 @@ export default function Cells({room, rooms, monthYear, housekeeping}: {room: Roo
     function onUpdate(reservation: Reservation): void {
         reservation = {...reservation, roomType: room.type, roomScheduleId: room.scheduleId, scheduleId: room.scheduleId }
         axios.post(process.env.REACT_APP_API_URL + "/Reservations/Edit", ToJsonReservation(reservation)).then(() => {
-            axios.put(process.env.REACT_APP_API_URL + "/Guest/Set/" + reservation.id, reservation.guests!.map(ToJsonGuest))
+            axios.put(process.env.REACT_APP_API_URL + "/Guests/Set/" + reservation.id, reservation.guests!.map(ToJsonGuest))
             .catch(err => {console.log(err)});
         })
         .then(() => navigation(0))
@@ -47,7 +47,7 @@ export default function Cells({room, rooms, monthYear, housekeeping}: {room: Roo
         axios.post(process.env.REACT_APP_API_URL + "/Reservations/Create", ToJsonReservation(reservation))
         .then(response => {
             reservation.guests!.forEach(guest => {
-                axios.post(process.env.REACT_APP_API_URL + "/Guest/Create", ToJsonGuest({...guest, reservationId: (response.data as Reservation).id}))
+                axios.post(process.env.REACT_APP_API_URL + "/Guests/Create", ToJsonGuest({...guest, reservationId: (response.data as Reservation).id}))
                 .catch(err => {console.log(err)});
             });
         })

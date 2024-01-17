@@ -56,7 +56,7 @@ export default function ReservationModal({reservation, onSave, show, setShow, ro
        setShow(false);
     }
     const onRemoveGuest = (guest: Guest): void => {
-        if(tempReservation.id! > -1) axios.delete(process.env.REACT_APP_API_URL + "/Guest/Delete/" + guest.id);
+        if(tempReservation.id! > -1) axios.delete(process.env.REACT_APP_API_URL + "/Guests/Delete/" + guest.id);
         setTempReservation({...tempReservation, guests: tempReservation.guests!.filter(p => p.id !== guest.id)});
         toReservationModal();
     }
