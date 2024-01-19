@@ -27,6 +27,7 @@ export function ToJsonReservation(reservation: Reservation): any{
         checkOut: !reservation.checkOut ? undefined : toJsonDateOnly(reservation.checkOut),
         room: undefined,
         roomNumber: reservation.roomNumber,
+        roomScheduleId: reservation.roomScheduleId,
         roomType: ToJsonRoomType(reservation.roomType!), 
         bookingSource: ToJsonBookingSource(reservation.bookingSource!),
         flightArrivalNumber: reservation.flightArrivalNumber,
