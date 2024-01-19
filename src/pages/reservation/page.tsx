@@ -213,6 +213,7 @@ function CanFit(reservation: Reservation, room: Room): boolean {
 
 export default function Page(reservation: Reservation, rooms: Room[]): {body: ReactElement, action: () => Reservation | undefined} {
     if(!reservation.scheduleId) throw new Error("Reservation scheduleId is undefined");
+    if(!reservation.roomScheduleId) throw new Error("Reservation roomScheduleId is undefined");
     if(!reservation.roomType) throw new Error("Reservation roomType is undefined");
     if(!rooms) throw new Error("Rooms is undefined");
     if(rooms.length === 0) throw new Error("Rooms is empty");
