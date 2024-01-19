@@ -131,4 +131,4 @@ function ScheduleRowCreate({onReturn, addSchedule}: {onReturn: VoidFunction, add
     }
 
 export default ScheduleMain;
-export const link: PageLink = {route: "/schedule", element: <ScheduleMain/>, icon: _info.icon};
+export const page: PageLink = {route: "/schedule", element: <ScheduleMain/>, icon: _info.icon};

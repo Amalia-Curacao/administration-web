@@ -78,7 +78,7 @@ function groupByRoomType(rooms: Room[]): {[type: string]: Room[]} {
 
 // #endregion
 
-export const link: PageLink = {
+export const page: PageLink = {
     icon: _info.icon,
     route: '/room',
     element: <RoomIndexBody/>,
