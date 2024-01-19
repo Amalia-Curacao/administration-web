@@ -73,12 +73,12 @@ function ScheduleMain(): ReactElement {
                 <thead className="h4">
                     <tr className="bg-secondary">
                         <th className="table-bordered bg-secondary">
-                            <span>
+                            <span className="text-dark">
                                 Id
                             </span>
                         </th>
                         <th className="table-bordered bg-secondary">
-                            <span>
+                            <span className="text-dark">
                                 Name
                             </span>
                         </th>
@@ -93,7 +93,6 @@ function ScheduleMain(): ReactElement {
                     <tr hidden={!creating}>
                         <ScheduleRowCreate addSchedule={(schedule) => createSchedule(schedule)} onReturn={onReturn}/>
                     </tr>
-
                     {schedules.map(schedule => <ScheduleRow key={schedule.id} schedule={schedule} onEdit={onEdit} onDelete={deleteSchedule}/>)}
                 </tbody>        
             </table>
@@ -120,17 +119,15 @@ function ScheduleRowCreate({onReturn, addSchedule}: {onReturn: VoidFunction, add
             console.log("error");
         }
 
-        return(
-            <>
-                <td colSpan={1} className="bg-secondary"/>
-                <td colSpan={1} className="bg-secondary rounded-0">
-                    {CreateSchedule().body}
-                </td>
-                <td colSpan={1} className="bg-secondary">
-                    <SaveButton onSave={onSave} onFailure={onFailure} onReturn={onReturn}/>
-                </td>
-            </>
-        )
+        return(<>
+            <td colSpan={1} className="bg-secondary"/>
+            <td colSpan={1} className="bg-secondary rounded-0">
+                {CreateSchedule().body}
+            </td>
+            <td colSpan={1} className="bg-secondary">
+                <SaveButton onSave={onSave} onFailure={onFailure} onReturn={onReturn}/>
+            </td>
+        </>)
     }
 
 export default ScheduleMain;
