@@ -6,7 +6,7 @@ import References from "../../tools/References";
 const references = new References();
 
 function Action() : Schedule | undefined {
-    return({id: -1, name: references.GetInput("name").current?.value ?? "", reservations: [], rooms: []});
+    return({id: -1, name: references.GetInput("name").current?.value ?? "", reservations: [], rooms: [], housekeepers: [], housekeepingTasks: []});
 }
 
 function Body(): ReactElement {

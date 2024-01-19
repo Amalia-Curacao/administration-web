@@ -24,7 +24,9 @@ function Action(schedule : Schedule) : Schedule | undefined {
         id: schedule.id, 
         name: references.GetInput("input").current?.value ?? "", 
         rooms: [], 
-        reservations: [] 
+        reservations: [],
+        housekeepers: [],
+        housekeepingTasks: []
     };
 }
 
