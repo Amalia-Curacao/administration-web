@@ -1,7 +1,7 @@
 import { ReactElement } from "react";
 import Schedule from "../../models/Schedule";
 
-function Body({schedule} : {schedule: Schedule}): ReactElement {
+export default function ScheduleIndex({schedule} : {schedule: Schedule}): ReactElement {
     return(<>
         <th colSpan={1} scope="col" className="bg-secondary">
             <span className="text-dark">{schedule.id}</span>
@@ -11,10 +11,3 @@ function Body({schedule} : {schedule: Schedule}): ReactElement {
         </th>
     </>);
 }
-
-function Action(): ReactElement {return(<></>)}
-
-
-export default function ScheduleIndex(schedule: Schedule): {body: ReactElement, action: ReactElement} {
-    return({body: Body({schedule: schedule}), action: Action()});
-};

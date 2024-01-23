@@ -35,7 +35,7 @@ function RoomIndexBody(): ReactElement {
             ?   <>
                 <div style={{borderRadius:"5px" }} className="p-3 m-3 mb-2 bg-primary d-flex flex-fill flex-row">
                     <MonthYearSelector monthYear={monthYear} onChange={onMonthYearSelected}/>
-                    <button onClick={() => navigate(pages["room index"].route + "/" + id + "/housekeeping")} className="btn btn-secondary btn-outline-primary float-end">Housekeeping</button>
+                    <button onClick={() => navigate(pages["housekeeper index"].route + "/" + id)} className="btn btn-secondary btn-outline-primary float-end">Housekeeping</button>
                 </div>
                 </>
             :   <Fragment/>}

@@ -4,7 +4,6 @@
 $check-in: #AFE1AF;
 $check-out: #F7B4A6;
 $occupied: #F7F1A6;
-$darken-percentage: 5%;
 $dark-check-in: darken($check-in, $darken-percentage);
 $dark-check-out: darken($check-out, $darken-percentage);
 $dark-occupied: darken($occupied, $darken-percentage);
