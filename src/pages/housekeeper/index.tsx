@@ -1,9 +1,9 @@
 import axios from "axios";
 import { Fragment, ReactElement, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import Housekeeper from "../../../models/Housekeeper";
+import Housekeeper from "../../models/Housekeeper";
 import Row, { CreateRow } from "./row";
-import PageLink from "../../../types/PageLink";
+import PageLink from "../../types/PageLink";
 
 function Body(): ReactElement {
     const {id} = useParams();
@@ -50,7 +50,7 @@ function Body(): ReactElement {
                                         Add
                                     </button>
                                 </div>
-                                <button className="btn btn-outline-warning">
+                                <button onClick={allHousekeepingTasks} className="btn btn-outline-warning">
                                     All
                                 </button>
                             </div>
@@ -101,6 +101,13 @@ function Body(): ReactElement {
         }
     }
     
+    function allHousekeepingTasks(): void {
+        axios.get(process.env.REACT_APP_API_URL + "/Housekeepers/GetAll/" + id)
+        .then(response => {
+            setHousekeepers(response.data as Housekeeper[]);
+        })
+        .catch(error => console.log(error));
+    }
 }
 
 export const page: PageLink = {

@@ -1,6 +1,6 @@
 import PageLink from "./types/PageLink";
 import { page as SchedulesPage } from "./pages/schedule/main";
-import { page as RoomsPage } from "./pages/room/index";
+import { page as RoomsPage } from "./pages/room/reservations/index";
 import { page as HousekeepersPage } from "./pages/housekeeper/index";
 import { RouteObject } from "react-router-dom";
 import Logo from "./svgs/logo";

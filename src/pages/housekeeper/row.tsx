@@ -1,6 +1,6 @@
 import { Fragment, ReactElement, useEffect, useState } from "react";
-import Housekeeper from "../../../models/Housekeeper";
-import References from "../../../tools/References";
+import Housekeeper from "../../models/Housekeeper";
+import References from "../../tools/References";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
