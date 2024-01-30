@@ -7,7 +7,7 @@ import PersonPrefix from "../../models/PersonPrefix";
 import Reservation from "../../models/Reservation";
 import Room from "../../models/Room";
 import {default as GuestPage} from "../guest/page";
-import {default as ReservationPage} from "../reservation/page";
+import {default as ReservationPage} from "./page";
 
 interface CreateReservationModalProps {
     checkIn: Date,

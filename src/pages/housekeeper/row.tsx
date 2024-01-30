@@ -3,6 +3,7 @@ import Housekeeper from "../../models/Housekeeper";
 import References from "../../tools/References";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { pages } from "../../routes";
 
 const references = new References();
 
@@ -12,7 +13,7 @@ export default function Row({housekeeper, readOnly, index, onEdit, onSave, onDel
     const [actions, setActions] = useState<ReactElement>();
     useEffect(() => {
         if(!readOnly) setActions(<SaveGroup onSave={updateHousekeeper} onReturn={onReturn}/>);
-        else setActions(<ActionGroup onEdit={onEdit} onDelete={deleteHousekeeper} onDetails={() => navigate("/housekeepers/tasks/" + housekeeper.id)}/>);
+        else setActions(<ActionGroup onEdit={onEdit} onDelete={deleteHousekeeper} onDetails={() => navigate(pages["housekeeping tasks"].route + "/" + housekeeper.id)}/>);
 
         function deleteHousekeeper(): void {
             axios.delete(process.env.REACT_APP_API_URL + "/Housekeepers/Delete/" + housekeeper.id)
@@ -41,7 +42,7 @@ export default function Row({housekeeper, readOnly, index, onEdit, onSave, onDel
             setActions(<SaveGroup onSave={updateHousekeeper} onReturn={onReturn}/>);
             onSave(housekeeper);
         }
-    }, [housekeeper, readOnly, onEdit, onSave, onDelete]);
+    }, [housekeeper, readOnly, onEdit, onSave, onDelete, navigate]);
 
     return (<tr className={bgModifier}>
         { readOnly ? <ReadonlyFields housekeeper={housekeeper}/> : <InputFields housekeeper={housekeeper}/> }

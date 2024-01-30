@@ -1,8 +1,6 @@
 import { ReactElement } from "react";
-import Reservation from "../../../models/Reservation";
 import Room from "../../../models/Room";
 import Cell from "./cell";
-import HousekeepingTask from "../../../models/HousekeepingTask";
 import "../../../scss/room.table.scss";
 
 interface Props {
@@ -12,12 +10,7 @@ interface Props {
     displayGuestNames: boolean,
     displayHousekeepingTasks: boolean,
 
-    On(reservation: Reservation, task: HousekeepingTask): {
-        occupy: VoidFunction,
-        onoccupied: VoidFunction,
-        checkIn: VoidFunction,
-        checkOut: VoidFunction,
-    }
+    On(date: Date, room: Room): void
 }
 
 export default function Cells({room, monthYear, displayGuestNames, displayHousekeepingTasks, On}: Props): ReactElement{

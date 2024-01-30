@@ -4,7 +4,7 @@ import { pages } from "../../../routes";
 import { MdBedroomParent } from "react-icons/md";
 import { FaLongArrowAltLeft, FaLongArrowAltRight } from "react-icons/fa";
 import "../../../scss/room.table.scss";
-import ReservationModal, { CreateReservationModal } from "../modal";
+import ReservationModal, { CreateReservationModal } from "../../reservation/modal";
 import { default as Rooms } from "../table";
 import PageLink from "../../../types/PageLink";
 import Room from "../../../models/Room";
@@ -13,7 +13,7 @@ import axios from "axios";
 import { MapAll as MapRooms } from "../../../mapping/room";
 import { ToJsonReservation, ToJsonGuest } from "../../../extensions/ToJson";
 
-function RoomIndexBody(): ReactElement {
+function Index(): ReactElement {
     const { id } = useParams();
     if(!id) throw new Error("Schedule ID is undefined.");
     const [rooms, setRooms] = useState<Room[]>([]);
@@ -37,16 +37,7 @@ function RoomIndexBody(): ReactElement {
             <button onClick={() => navigate(pages["housekeeper index"].route + "/" + id)} className="btn btn-secondary btn-outline-primary float-end">Housekeeping</button>
         </div>
         <div className="p-3 pb-0 d-flex flex-column flex-fill">
-            <Rooms monthYear={monthYear} rooms={rooms} displayGuestNames={true} displayHousekeepingTasks={true} On={
-                (reservation, _) => {
-                    return {
-                        occupy: () => callModal().edit(reservation),
-                        onoccupied: () => callModal().create(reservation.room!, reservation.checkIn!),
-                        checkIn: () => callModal().edit(reservation),
-                        checkOut: () => callModal().edit(reservation),
-                    }
-                }
-            }/>
+            <Rooms monthYear={monthYear} rooms={rooms} displayGuestNames={true} displayHousekeepingTasks={false} On={onCellClick}/>
         </div>
     </>);
     
@@ -54,18 +45,18 @@ function RoomIndexBody(): ReactElement {
         setMonthYear(monthYear);
     }
 
-    function callModal(): { create(room: Room, checkIn: Date): void, edit(reservation: Reservation): void } {
-        return {
-            create: (room: Room, checkIn: Date) => 
-                setModal(<CreateReservationModal checkIn={checkIn} room={room} rooms={rooms} onSave={onSaveNew} onHide={onHide}/>),
-            edit: (reservation) => 
-                setModal(<ReservationModal reservation={reservation} rooms={rooms} onSave={(r) => onSaveExisting(r, reservation)} onHide={onHide}/>),
+    function onCellClick(date: Date, room: Room): void {
+        const reservation = (room.reservations ?? []).find(r => (r.checkIn! <= date) && (r.checkOut! >= date));
+        if(!reservation){
+            setModal(<CreateReservationModal checkIn={date} room={room} rooms={rooms} onSave={onSaveNew} onHide={onHide}/>)
+        }
+        else{
+            setModal(<ReservationModal reservation={reservation} rooms={rooms} onSave={(r) => onSaveExisting(r, reservation)} onHide={onHide}/>)
         }
 
         function onHide(): void{
             setModal(<Fragment/>);
         }
-        
 
         function onSaveExisting(newR: Reservation | undefined, oldR: Reservation): void{
             newR ? onUpdate(newR) : onDelete(oldR)
@@ -121,6 +112,6 @@ function MonthYearSelector({monthYear, onChange}: {monthYear: Date, onChange: (m
 export const page: PageLink = {
     icon: <MdBedroomParent/>,
     route: '/room',
-    element: <RoomIndexBody/>,
+    element: <Index/>,
     params: '/:id'
 };

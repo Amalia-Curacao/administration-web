@@ -10,5 +10,5 @@ export default interface Room{
     scheduleId: number | undefined;
     schedule: Schedule | undefined;
     reservations: Reservation[] | undefined;
-    houseKeepingTasks: HousekeepingTask[] | undefined;
+    housekeepingTasks: HousekeepingTask[] | undefined;
 }

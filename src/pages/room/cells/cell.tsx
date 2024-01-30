@@ -6,7 +6,6 @@ import { CheckInCell } from "./checkIn";
 import { CheckOutCell } from "./checkOut";
 import { OccupiedCell } from "./occupied";
 import { OnoccupiedCell } from "./onoccupied";
-import HousekeepingTask from "../../../models/HousekeepingTask";
 import HousekeepingTaskType from "../../../models/HousekeepingTaskType";
 import { CiCirclePlus } from "react-icons/ci";
 import { FaPlus } from "react-icons/fa6";
@@ -20,19 +19,14 @@ interface Props {
     displayGuestNames: boolean,
     displayHousekeepingTasks: boolean,
 
-    On(reservation: Reservation, task: HousekeepingTask): {
-        occupy: VoidFunction,
-        onoccupied: VoidFunction,
-        checkIn: VoidFunction,
-        checkOut: VoidFunction,
-    }
+    On(date: Date, room: Room): void
 }
 
 export default function Cell({room, current, displayGuestNames, displayHousekeepingTasks, On}: Props): ReactElement {
     const occupy: Reservation[] =  (room.reservations ?? []).filter(r => (r.checkIn! <= current) && (r.checkOut! >= current));
     const checkIn = occupy.find(r => isSameDay(r.checkIn!, current));
     const checkOut = occupy.find(r => isSameDay(r.checkOut!, current));
-    const task = (room.houseKeepingTasks ?? []).find(t => isSameDay(t.date!, current))
+    const task = (room.housekeepingTasks ?? []).find(t => isSameDay(t.date!, current))
         ?? {
                 date: current,
                 room: room, 
@@ -48,6 +42,7 @@ export default function Cell({room, current, displayGuestNames, displayHousekeep
     </td>);
 
     function Reservation(): ReactElement {
+        const on = () => On(current, room);
         switch(true) {
             case occupy.length === 0: 
                 return (<Onoccupied shape=""/>);
@@ -68,28 +63,19 @@ export default function Cell({room, current, displayGuestNames, displayHousekeep
         }
 
         function Onoccupied({shape}: {shape: string}): ReactElement {
-            const reservation: Reservation = {
-                checkIn: current,
-                roomType: room.type,
-                room: room,
-                roomNumber: room.number,
-                roomScheduleId: room.scheduleId,
-                schedule: room.schedule,
-                scheduleId: room.scheduleId,
-            } as Reservation;
-            return (<OnoccupiedCell onClick={() => On(reservation, task).onoccupied()} shape={shape}/>);
+            return (<OnoccupiedCell onClick={on} shape={shape}/>);
         }
     
         function CheckIn(): ReactElement {
-            return (<CheckInCell onClick={() => On(checkIn!, task).checkIn()}/>);
+            return (<CheckInCell onClick={on}/>);
         }
     
         function CheckOut(): ReactElement {
-            return (<CheckOutCell onClick={() => On(checkOut!, task).checkOut()}/>);
+            return (<CheckOutCell onClick={on}/>);
         }
     
         function Occupied(): ReactElement {
-            return(<OccupiedCell onClick={() => On(occupy[0]!, task).occupy()} guestName={GuestName(occupy[0], current)}/>);
+            return(<OccupiedCell onClick={on} guestName={GuestName(occupy[0], current)}/>);
             
             function GuestName(occupied: Reservation | undefined, currentDate: Date) : string {
                 if(!occupied) return("");

@@ -46,6 +46,9 @@ path {
 .btn-outline-primary:hover {
     color: $secondary !important;
     background-color: $primary !important;
+}
+
+.bg-primary .btn-outline-primary:hover{
     border-color: $secondary !important;
 }
 

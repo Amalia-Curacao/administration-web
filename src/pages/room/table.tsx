@@ -5,8 +5,6 @@ import RoomType from "../../models/RoomType";
 import { MdBedroomParent } from "react-icons/md";
 import Cells from "./cells/cells";
 import "../../scss/room.table.scss";
-import HousekeepingTask from "../../models/HousekeepingTask";
-import Reservation from "../../models/Reservation";
 
 interface Props {
     rooms: Room[],
@@ -15,12 +13,7 @@ interface Props {
     displayGuestNames: boolean,
     displayHousekeepingTasks: boolean,
     
-    On(reservation: Reservation, task: HousekeepingTask): {
-        occupy: VoidFunction,
-        onoccupied: VoidFunction,
-        checkIn: VoidFunction,
-        checkOut: VoidFunction,
-    }
+    On(date: Date, room: Room): void
 }
 
 export default function Table({rooms, monthYear, displayGuestNames, displayHousekeepingTasks, On}: Props): ReactElement {
