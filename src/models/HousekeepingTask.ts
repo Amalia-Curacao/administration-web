@@ -5,12 +5,15 @@ import HousekeepingTaskType from "./HousekeepingTaskType";
 
 export default interface HousekeepingTask {
     date?: Date,
+    type?: HousekeepingTaskType,
+
+    room?: Room,
     roomNumber?: number,
     roomScheduleId?: number,
-    room?: Room,
-    scheduleId?: number,
+
     schedule?: Schedule,
-    type?: HousekeepingTaskType,
-    housekeeperId?: number,
+    scheduleId?: number,
+    
     housekeeper?: Housekeeper
+    housekeeperId?: number,
 }

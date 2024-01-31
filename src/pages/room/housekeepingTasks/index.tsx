@@ -1,7 +1,7 @@
 import { Fragment, ReactElement, useEffect, useState } from "react";
 import PageLink from "../../../types/PageLink";
 import { GiMagicBroom } from "react-icons/gi";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { MapAll as MapRooms } from "../../../mapping/room";
 import Room from "../../../models/Room";
 import axios from "axios";
@@ -10,11 +10,14 @@ import { isSameDay } from "../../../extensions/Date";
 import HousekeepingTask from "../../../models/HousekeepingTask";
 import { FaLongArrowAltLeft, FaLongArrowAltRight } from "react-icons/fa";
 import Housekeeper from "../../../models/Housekeeper";
+import HousekeepingTaskModal, { CreateHousekeepingTaskModal } from "../../housekeepingTask/modal";
+import { ToJsonHousekeepingTask } from "../../../extensions/ToJson";
 
 
 export default function Index(): ReactElement {
     const { id } = useParams();
     if(!id) throw new Error("Housekeeper is undefined.");
+    const navigate = useNavigate();
     const [housekeeper, setHousekeeper] = useState<Housekeeper>();
     const [rooms, setRooms] = useState<Room[]>([]);
     const [modal, setModal] = useState<ReactElement>(<Fragment/>);
@@ -25,13 +28,14 @@ export default function Index(): ReactElement {
         .then(async response => {
             setHousekeeper(response.data as Housekeeper);
         })
-        .then(() => 
+        .then(() => {
+            if(housekeeper?.scheduleId === undefined) return;
             axios.get(process.env.REACT_APP_API_URL + "/Rooms/Get/" + housekeeper?.scheduleId)
-            .then(async response => {
+            .then(async response => {      
                 setRooms(MapRooms(response.data as Room[]));
             })
-            .catch(error => console.log(error)))
-        .catch(error => console.log(error));
+            .catch(error => console.log(error))
+        }).catch(error => console.log(error));
 
         
     }, [housekeeper?.scheduleId, id, setRooms, setHousekeeper]);
@@ -49,7 +53,7 @@ export default function Index(): ReactElement {
     function onCellClick(date: Date, room: Room): void {
         const task = (room.housekeepingTasks ?? []).find(task => isSameDay(task.date!, date));
         if(!task) {
-            setModal(<CreateHousekeepingTaskModal date={date} room={room} onSave={onSaveNew} onHide={onHide}/>)
+            setModal(<CreateHousekeepingTaskModal date={date} room={room} housekeeper={housekeeper} onSave={onSaveNew} onHide={onHide}/>)
         }
         else {
             setModal(<HousekeepingTaskModal task={task} onSave={(t) => onSaveExisting(t, task)} onHide={onHide}/>)
@@ -59,24 +63,25 @@ export default function Index(): ReactElement {
             setModal(<Fragment/>);
         }
 
-        function onSaveNew(task: HousekeepingTask): void {
-            setRooms(rooms.map(r => {
-                if(r.number === room.number){
-                    r.housekeepingTasks = [...(r.housekeepingTasks ?? []), task];
-                }
-                return r;
-            }));
-            onHide();
+        function onSaveNew(task: HousekeepingTask | undefined): void {
+            if(!task){
+                onHide();
+            }
+            else{
+                axios.post(process.env.REACT_APP_API_URL + "/HousekeepingTasks/Create/", ToJsonHousekeepingTask(task))
+                    .then(() => navigate(0));
+            }
         }
 
-        function onSaveExisting(task: HousekeepingTask, oldTask: HousekeepingTask): void {
-            setRooms(rooms.map(r => {
-                if(r.number === room.number){
-                    r.housekeepingTasks = [...(r.housekeepingTasks ?? []).filter(t => t !== oldTask), task];
-                }
-                return r;
-            }));
-            onHide();
+        function onSaveExisting(task: HousekeepingTask | undefined, oldTask: HousekeepingTask): void {
+            if(!task){
+                axios.post(process.env.REACT_APP_API_URL + "/HousekeepingTasks/Delete/", ToJsonHousekeepingTask(oldTask))
+                .then(() => navigate(0));
+            }
+            else{
+                axios.post(process.env.REACT_APP_API_URL + "/HousekeepingTasks/Update/", ToJsonHousekeepingTask(task))
+                .then(() => navigate(0));
+            }
         }
     }
 }

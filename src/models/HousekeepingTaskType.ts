@@ -1,8 +1,8 @@
 enum HousekeepingTaskType {
-	None = 0,
-	Towels = 1,
-	Bedsheets = 2,
-	All = 3,
+	None = "None",
+	Towels = "Towels",
+	Bedsheets = "Bedsheets",
+	All = "All",
 }
 
 export default HousekeepingTaskType;

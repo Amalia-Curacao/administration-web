@@ -102,7 +102,19 @@ button.hover-danger:hover{
     background: $dark-check-out !important;
 }
 
-.darken > button{
-    background-color: $dark-secondary !important;
+
+.housekeeping-task-icon{
+    // if you change the size, you need to change it in cell.tsx as well
+    $housekeeping-task-icon-size: 1.5em;
+    position: absolute;
+
+    right: calc(50% - $housekeeping-task-icon-size / 2);
+    bottom: calc(50% - $housekeeping-task-icon-size / 2);
 }
+
+.housekeeping-task-container{
+    height: 100%;
+    width: 100%;
+}
+
 // #endregion

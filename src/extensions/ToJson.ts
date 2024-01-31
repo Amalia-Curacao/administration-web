@@ -1,5 +1,7 @@
 import BookingSource from "../models/BookingSource";
 import Guest from "../models/Guest";
+import HousekeepingTask from "../models/HousekeepingTask";
+import HousekeepingTaskType from "../models/HousekeepingTaskType";
 import PersonPrefix from "../models/PersonPrefix";
 import Reservation from "../models/Reservation";
 import RoomType from "../models/RoomType";
@@ -23,29 +25,46 @@ export function ToJsonReservation(reservation: Reservation): any{
     return {
         id: reservation.id,
         guests: undefined,
-        checkIn: !reservation.checkIn ? undefined : toJsonDateOnly(reservation.checkIn), 
-        checkOut: !reservation.checkOut ? undefined : toJsonDateOnly(reservation.checkOut),
+        checkIn: !reservation.checkIn ? undefined : ToJsonDateOnly(reservation.checkIn), 
+        checkOut: !reservation.checkOut ? undefined : ToJsonDateOnly(reservation.checkOut),
         room: undefined,
         roomNumber: reservation.roomNumber,
         roomScheduleId: reservation.roomScheduleId,
         roomType: ToJsonRoomType(reservation.roomType!), 
         bookingSource: ToJsonBookingSource(reservation.bookingSource!),
         flightArrivalNumber: reservation.flightArrivalNumber,
-        flightArrivalTime: !reservation.flightArrivalTime ? undefined : toJsonTimeOnly(reservation.flightArrivalTime),
+        flightArrivalTime: !reservation.flightArrivalTime ? undefined : ToJsonTimeOnly(reservation.flightArrivalTime),
         flightDepartureNumber: reservation.flightDepartureNumber,
-        flightDepartureTime: !reservation.flightDepartureTime ? undefined : toJsonTimeOnly(reservation.flightDepartureTime),
+        flightDepartureTime: !reservation.flightDepartureTime ? undefined : ToJsonTimeOnly(reservation.flightDepartureTime),
         schedule: undefined,
         scheduleId: reservation.scheduleId,
         remarks: reservation.remarks,
     };
 }
 
-export function toJsonDateOnly(date: Date): string {
+export function ToJsonHousekeepingTask(task: HousekeepingTask): any {
+    return {
+        date: !task.date ? undefined : ToJsonDateOnly(task.date),
+        type: !task.type ? undefined : ToJsonHousekeepingTaskType(task.type),
+
+        room: undefined,
+        roomNumber: task.roomNumber,
+        roomScheduleId: task.roomScheduleId,
+
+        schedule: undefined,
+        scheduleId: task.scheduleId,
+        
+        housekeeper: undefined,
+        housekeeperId: task.housekeeperId,
+    };
+}
+
+export function ToJsonDateOnly(date: Date): string {
     if(date instanceof Date) return date.toISOString().split('T')[0];
     else return date;
 }
 
-export function toJsonTimeOnly(date: Date): string {
+export function ToJsonTimeOnly(date: Date): string {
     if (date instanceof Date) return date.toTimeString().split(' ')[0];
     else return date;
 }
@@ -81,6 +100,21 @@ export function ToJsonBookingSource(bookingSource: BookingSource): number{
             return 6;
         default:
             throw new Error("BookingSource is not implemented");
+    }
+}
+
+export function ToJsonHousekeepingTaskType(type: HousekeepingTaskType): number{
+    switch(type){
+        case HousekeepingTaskType.None:
+            return 0;
+        case HousekeepingTaskType.Towels:
+            return 1;
+        case HousekeepingTaskType.Bedsheets:
+            return 2;
+        case HousekeepingTaskType.All:
+            return 3;
+        default:
+            throw new Error("HousekeepingTaskType is not implemented");
     }
 }
 
