@@ -5,6 +5,7 @@ $info: #efeeee;
 $success: #26C485;
 $warning: #F18F01;
 $danger: #F71735;
+$darken-percentage: 5%;
 
 // Dark mode
 $primary-dark: #2E4057;
@@ -20,4 +21,6 @@ $secondary-dark: #545c63;
 
     primary-dark: $primary-dark;
     secondary-dark: $secondary-dark;
+    
+    darken-percentage: $darken-percentage;
 }

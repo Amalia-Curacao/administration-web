@@ -4,7 +4,7 @@ import Schedule from "../../models/Schedule";
 import ScheduleEdit from "./edit";
 import ScheduleIndex from ".";
 import {PageState as State} from "../../types/PageState";
-import { routes } from "../../routes";
+import { pages } from "../../routes";
 import { useNavigate } from "react-router-dom";
 
 function ScheduleRow({schedule, onDelete, onEdit}: {schedule: Schedule, onEdit: (schedule: Schedule) => void, onDelete: (schedule: Schedule) => void}): ReactElement {    
@@ -36,7 +36,7 @@ function ScheduleRow({schedule, onDelete, onEdit}: {schedule: Schedule, onEdit: 
 
 function ScheduleRowIndex({schedule, onEdit, onDelete}: {schedule: Schedule, onEdit: VoidFunction, onDelete: (toDelete: Schedule) => void}): ReactElement {
     return(<tr>
-        {ScheduleIndex(schedule).body}
+        <ScheduleIndex schedule={schedule}/>
         <td colSpan={1} className="bg-secondary"> 
             <div className="btn-group float-end">
                 <ActionGroup onDelete={() => onDelete(schedule)} schedule={schedule} onEdit={onEdit}/>
@@ -69,7 +69,7 @@ function ActionGroup({schedule, onDelete, onEdit}: {schedule: Schedule, onDelete
 
     return(
         <div className="btn-group">
-            <button onClick={() => navigate(routes["room index"].route + "/" + schedule.id, {replace: true})} className="btn btn-outline-primary">Details</button>
+            <button onClick={() => navigate(pages["room index"].route + "/" + schedule.id, {replace: true})} className="btn btn-outline-primary">Details</button>
             <button onClick={onEdit} className="btn btn-outline-warning">Edit</button>
             <button onClick={onDelete} className="btn btn-outline-danger">Delete</button>
         </div>);

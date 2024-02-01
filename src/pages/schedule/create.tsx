@@ -1,15 +1,18 @@
-import { ReactElement, createRef } from "react";
+import { ReactElement } from "react";
 import Schedule from "../../models/Schedule";
+import References from "../../tools/References";
 
-const refNameInput = createRef<HTMLInputElement>();
+
+const references = new References();
+
 function Action() : Schedule | undefined {
-    return({id: -1, name: refNameInput.current?.value ?? "", reservations: [], rooms: []});
+    return({id: -1, name: references.GetInput("name").current?.value ?? "", reservations: [], rooms: [], housekeepers: [], housekeepingTasks: []});
 }
 
 function Body(): ReactElement {
     return(<>
         <div className="bg-secondary p-0">
-            <input ref={refNameInput} placeholder="Name" type="text" className="form-control bg-secondary border-primary"/>
+            <input ref={references.GetInput("name")} placeholder="Name" type="text" className="form-control bg-secondary border-primary"/>
         </div>
     </>);
 }

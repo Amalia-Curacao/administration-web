@@ -4,9 +4,9 @@
 $check-in: #AFE1AF;
 $check-out: #F7B4A6;
 $occupied: #F7F1A6;
-$darken-percentage: 5%;
 $dark-check-in: darken($check-in, $darken-percentage);
 $dark-check-out: darken($check-out, $darken-percentage);
+$dark-occupied: darken($occupied, $darken-percentage);
 $dark-secondary: darken($secondary, $darken-percentage);
 $dark-primary: darken($primary, $darken-percentage);
 $cell-height: 40px;
@@ -43,8 +43,10 @@ $cell-width: 34px;
 
 .guest-name {
     position: absolute;
-    z-index: 2 !important;
+    z-index: 2;
+    margin-top: calc(($cell-height / 3) * -1);
     white-space: nowrap;
+    font-size: large;
 }
 
 button.no-decoration{
@@ -88,19 +90,18 @@ button.hover-danger:hover{
     filter:brightness(95%);
 }
 
-.darken > .occupied{
-    background-color: darken($occupied, $darken-percentage) !important;
+.housekeeping-task-icon{
+    // if you change the size, you need to change it in cell.tsx as well
+    $housekeeping-task-icon-size: 1.5em;
+    position: absolute;
+
+    right: calc(50% - $housekeeping-task-icon-size / 2);
+    bottom: calc(50% - $housekeeping-task-icon-size / 2);
 }
 
-.darken > .check-in{
-    background: darken($check-in, $darken-percentage) !important;
+.housekeeping-task-container{
+    height: 100%;
+    width: 100%;
 }
 
-.darken > .check-out{
-    background: darken($check-out, $darken-percentage) !important;
-}
-
-.darken > button{
-    background-color: darken($secondary, $darken-percentage) !important;
-}
 // #endregion

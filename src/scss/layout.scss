@@ -8,36 +8,56 @@ path {
     stroke: currentColor;
 }
 
-.btn-outline-success:hover {
-    color: $secondary !important;
-}
-
 .btn-outline-success {
     color: $success !important;
+    background-color: $secondary !important;
+}
+
+.btn-outline-success:hover {
+    color: $secondary !important;
+    background-color: $success !important;
 }
 
 .btn-outline-warning {
     color: $warning !important;
+    background-color: $secondary !important;
 }
 
 .btn-outline-warning:hover {
     color: $secondary !important;
+    background-color: $warning !important;
 }
 
 .btn-outline-danger {
     color: $danger !important;
+    background-color: $secondary !important;
 }
 
 .btn-outline-danger:hover {
     color: $secondary !important;
+    background-color: $danger !important;
 }
 
 .btn-outline-primary {
     color: $primary !important;
+    background-color: $secondary !important;
 }
 
 .btn-outline-primary:hover {
     color: $secondary !important;
+    background-color: $primary !important;
+}
+
+.bg-primary .btn-outline-primary:hover{
+    border-color: $secondary !important;
+}
+
+.darken {
+    filter: brightness(calc(100% - $darken-percentage));
+}
+
+.lighten {
+    filter: brightness(calc(100% + $darken-percentage));
 }
 
 @import "node_modules/bootstrap/scss/bootstrap";

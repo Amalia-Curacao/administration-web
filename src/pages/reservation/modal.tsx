@@ -4,10 +4,19 @@ import BookingSource from "../../models/BookingSource";
 import Guest from "../../models/Guest";
 import Reservation from "../../models/Reservation";
 import Room from "../../models/Room";
-import ReservationPage from "./page";
-import GuestModal, { CreateGuestModal} from "../guest/modal";
+import {default as ReservationPage} from "./page";
+import axios from "axios";
+import GuestModal, { CreateGuestModal } from "../guest/modal";
 
-export function CreateReservationModal({checkIn, room, rooms, show, setShow, onSave}: {checkIn: Date, room: Room, rooms: Room[], show: boolean, setShow: (b: boolean) => void, onSave: (r: Reservation) => void}): ReactElement {
+interface CreateReservationModalProps {
+    checkIn: Date,
+    room: Room,
+    rooms: Room[],
+    onSave: (r: Reservation | undefined) => void,
+    onHide: VoidFunction,
+}
+
+export function CreateReservationModal({checkIn, room, rooms, onSave, onHide}: CreateReservationModalProps): ReactElement {
     const blankReservation: Reservation = {
         id: -1,
         checkIn: checkIn,
@@ -27,10 +36,18 @@ export function CreateReservationModal({checkIn, room, rooms, show, setShow, onS
         guests: []
     };
 
-    return(<ReservationModal show={show} setShow={setShow} reservation={blankReservation} rooms={rooms} onSave={(r: Reservation | undefined) => onSave(r!)}/>);
+    return(<ReservationModal reservation={blankReservation} rooms={rooms} onSave={onSave} onHide={onHide}/>);
 }
 
-export default function ReservationModal({reservation, onSave, show, setShow, rooms}: {reservation: Reservation, onSave: (r: Reservation | undefined) => void, show: boolean, setShow: (s: boolean) => void, rooms: Room[]}): ReactElement {
+interface Props{
+    reservation: Reservation,
+    rooms: Room[],
+    onSave: (r: Reservation | undefined) => void,
+    onHide: VoidFunction,
+}
+
+export default function ReservationModal({reservation, onSave, onHide, rooms}: Props): ReactElement {
+    const [show, setShow] = useState<boolean>(true);
     const [tempReservation, setTempReservation] = useState<Reservation>({...reservation, guests: reservation.guests ?? []});
     const [showGuest, setShowGuest] = useState<{[index: number]: boolean}>({});
     const reservationPage = ReservationPage(tempReservation, rooms);
@@ -39,6 +56,7 @@ export default function ReservationModal({reservation, onSave, show, setShow, ro
         Object.keys(showGuest).forEach(key => setShowGuest(showGuest => ({...showGuest, [key]: false})));
         setShow(true);
     };
+    
     const toGuestModal = (index: number): void => {
         setShow(false);
         setShowGuest(showGuest => ({...showGuest, [index]: true}));
@@ -50,14 +68,15 @@ export default function ReservationModal({reservation, onSave, show, setShow, ro
         onSave({...reservation!, guests: tempReservation.guests});
         setShow(false);
     }
+
     const onRemoveReservation = (): void => {
        onSave(undefined);
        setShow(false);
     }
+
     const onRemoveGuest = (guest: Guest): void => {
-        const listWithoutGuest = tempReservation.guests!.filter(g => g.id !== guest.id);
-        const guests = listWithoutGuest!.map(g => g.id! >= 0 ? g : {...g, id: -listWithoutGuest.length});
-        setTempReservation({...tempReservation, guests: guests});
+        if(tempReservation.id! > -1) axios.delete(process.env.REACT_APP_API_URL + "/Guests/Delete/" + guest.id);
+        setTempReservation({...tempReservation, guests: tempReservation.guests!.filter(p => p.id !== guest.id)});
         toReservationModal();
     }
     const onSaveGuest = (guest: Guest): void => {
@@ -70,7 +89,7 @@ export default function ReservationModal({reservation, onSave, show, setShow, ro
     }
 
     return(<>
-        <Modal show={show} onHide={() => setShow(false)}>
+        <Modal show={show} onHide={onHide}>
             <Modal.Body style={{borderRadius: "5px 5px 0px 0px"}} className="bg-primary">
                 {reservationPage.body}
             </Modal.Body>
