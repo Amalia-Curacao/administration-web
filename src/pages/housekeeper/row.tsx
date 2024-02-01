@@ -13,7 +13,7 @@ export default function Row({housekeeper, readOnly, index, onEdit, onSave, onDel
     const [actions, setActions] = useState<ReactElement>();
     useEffect(() => {
         if(!readOnly) setActions(<SaveGroup onSave={updateHousekeeper} onReturn={onReturn}/>);
-        else setActions(<ActionGroup onEdit={onEdit} onDelete={deleteHousekeeper} onDetails={() => navigate(pages["housekeeping tasks"].route + "/" + housekeeper.id)}/>);
+        else setActions(<ActionGroup onEdit={onEdit} onDelete={deleteHousekeeper} onDetails={() => navigate(pages["housekeeping tasks"].route + "/" + housekeeper.scheduleId! + "/" + housekeeper.id!)}/>);
 
         function deleteHousekeeper(): void {
             axios.delete(process.env.REACT_APP_API_URL + "/Housekeepers/Delete/" + housekeeper.id)

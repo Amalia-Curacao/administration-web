@@ -43,7 +43,7 @@ $cell-width: 34px;
 
 .guest-name {
     position: absolute;
-    z-index: 1;
+    z-index: 2;
     margin-top: calc(($cell-height / 3) * -1);
     white-space: nowrap;
     font-size: large;
@@ -89,19 +89,6 @@ button.hover-danger:hover{
 .darken-on-hover:hover{
     filter:brightness(95%);
 }
-
-.darken > .occupied{
-    background-color: $dark-occupied !important;
-}
-
-.darken > .check-in{
-    background: $dark-check-in !important;
-}
-
-.darken > .check-out{
-    background: $dark-check-out !important;
-}
-
 
 .housekeeping-task-icon{
     // if you change the size, you need to change it in cell.tsx as well

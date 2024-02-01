@@ -10,17 +10,17 @@ interface Props {
     displayGuestNames: boolean,
     displayHousekeepingTasks: boolean,
 
-    On(date: Date, room: Room): void
+    OnCellClick(date: Date, room: Room): void
 }
 
-export default function Cells({room, monthYear, displayGuestNames, displayHousekeepingTasks, On}: Props): ReactElement{
+export default function Cells({room, monthYear, displayGuestNames, displayHousekeepingTasks, OnCellClick}: Props): ReactElement{
     const amount = new Date(monthYear.getFullYear(), monthYear.getMonth() + 1, 0).getDate();
     let days: ReactElement[] = [];
 
     for(let day = 1; day <= amount; day++) {
         const current: Date = new Date(monthYear.getFullYear(), monthYear.getMonth(), day);
 
-        days.push(<Cell room={room} current={current} displayGuestNames={displayGuestNames} displayHousekeepingTasks={displayHousekeepingTasks} On={On}/>);
+        days.push(<Cell room={room} current={current} displayGuestNames={displayGuestNames} displayHousekeepingTasks={displayHousekeepingTasks} OnClick={OnCellClick}/>);
     }
 
     return(<tr className="d-flex flex-fill bg-secondary p-0">

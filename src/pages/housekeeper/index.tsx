@@ -1,13 +1,15 @@
 import axios from "axios";
 import { Fragment, ReactElement, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Housekeeper from "../../models/Housekeeper";
 import Row, { CreateRow } from "./row";
 import PageLink from "../../types/PageLink";
+import { pages } from "../../routes";
 
 function Body(): ReactElement {
     const {id} = useParams();
     if(!id) throw new Error("Schedule ID is undefined.");
+    const navigate = useNavigate();
     const [housekeepers, setHousekeepers] = useState<Housekeeper[]>([]);
     const [modifying, setModifying] = useState<Housekeeper | undefined>(undefined);
     const [createRow, setCreateRow] = useState<ReactElement>(<></>);
@@ -101,18 +103,14 @@ function Body(): ReactElement {
         }
     }
     
-    function allHousekeepingTasks(): void {
-        axios.get(process.env.REACT_APP_API_URL + "/Housekeepers/GetAll/" + id)
-        .then(response => {
-            setHousekeepers(response.data as Housekeeper[]);
-        })
-        .catch(error => console.log(error));
+    function allHousekeepingTasks(): void {  
+        navigate(pages["housekeeping tasks"].route + "/" + id);
     }
 }
 
 export const page: PageLink = {
     route: "/housekeepers",
     element: <Body/>,
-    icon: <></>,
+    icon: <Fragment/>,
     params: "/:id",
 };

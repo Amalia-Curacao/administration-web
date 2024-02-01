@@ -13,10 +13,10 @@ interface Props {
     displayGuestNames: boolean,
     displayHousekeepingTasks: boolean,
     
-    On(date: Date, room: Room): void
+    OnCellClick(date: Date, room: Room): void
 }
 
-export default function Table({rooms, monthYear, displayGuestNames, displayHousekeepingTasks, On}: Props): ReactElement {
+export default function Table({rooms, monthYear, displayGuestNames, displayHousekeepingTasks, OnCellClick}: Props): ReactElement {
     if(rooms.length === 0) return(<Fragment/>);
     const groupedRooms = groupByRoomType(rooms);
 
@@ -34,7 +34,7 @@ export default function Table({rooms, monthYear, displayGuestNames, displayHouse
                             displayHousekeepingTasks={displayHousekeepingTasks} 
                             monthYear={monthYear} 
                             room={r} 
-                            On={On}/>
+                            OnCellClick={OnCellClick}/>
                     </tr>) }
                 </tbody>
             </table>)})

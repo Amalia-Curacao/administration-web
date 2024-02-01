@@ -3,27 +3,26 @@ import HousekeepingTask from "../../models/HousekeepingTask";
 import Room from "../../models/Room";
 import { default as HousekeepingTaskPage } from "./page";
 import { Modal } from "react-bootstrap";
-import Housekeeper from "../../models/Housekeeper";
+import HousekeepingTaskType from "../../models/HousekeepingTaskType";
 
 interface CreateHousekeepingTaskModalProps {
     date: Date,
     room: Room,
-    housekeeper: Housekeeper | undefined,
 
     onSave: (t: HousekeepingTask | undefined) => void,
     onHide: VoidFunction,
 }
 
-export function CreateHousekeepingTaskModal({ date, room, housekeeper, onSave, onHide }: CreateHousekeepingTaskModalProps): ReactElement {
+export function CreateHousekeepingTaskModal({ date, room, onSave, onHide }: CreateHousekeepingTaskModalProps): ReactElement {
     const blankTask: HousekeepingTask = {
         date: date,
         room: room,
         roomNumber: room.number,
         roomScheduleId: room.scheduleId,
         scheduleId: room.scheduleId,
-        type: undefined,
-        housekeeper: housekeeper,
-        housekeeperId: housekeeper?.id,
+        type: HousekeepingTaskType.None,
+        housekeeper: undefined,
+        housekeeperId: undefined,
         schedule: undefined
     };
 

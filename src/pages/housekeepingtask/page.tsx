@@ -17,7 +17,7 @@ function Body({task}: {task: HousekeepingTask}): ReactElement {
         })
         .catch(error => console.log(error));
     }, [task.scheduleId, setHousekeepers]);
-
+    
     return(<table className="w-100">
         <tbody>
             <tr>
@@ -35,8 +35,8 @@ function Body({task}: {task: HousekeepingTask}): ReactElement {
                 <td colSpan={2} className="bg-primary text-secondary">
                     <label className="w-100"> Housekeeper 
                         <InputField refKey={"housekeeper"} references={references}>
-                            <select onChange={onUpdateHousekeeper} ref={references.GetSelect("housekeeper")} defaultValue={""} className="form-control">
-                                {housekeepers.map(h => <option key={h.id} value={h.id}>{h.firstName} {h.lastName}</option>)}
+                            <select onChange={onUpdateHousekeeper} ref={references.GetSelect("housekeeper")} className="form-control">
+                                {housekeepers.map(h => <option selected={h.id === task.housekeeperId} key={h.id} value={h.id}>{h.firstName} {h.lastName}</option>)}
                             </select>
                         </InputField>
                     </label>
@@ -63,7 +63,7 @@ function Action(task: HousekeepingTask): HousekeepingTask | undefined {
         date: task.date,
         type: task.type,
         
-        housekeeperId: task.housekeeperId,
+        housekeeperId: parseInt(references.GetSelect("housekeeper")!.current?.value!),
         housekeeper: task.housekeeper,
         
         scheduleId: task.scheduleId,

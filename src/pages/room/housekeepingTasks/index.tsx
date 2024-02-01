@@ -15,8 +15,9 @@ import { ToJsonHousekeepingTask } from "../../../extensions/ToJson";
 
 
 export default function Index(): ReactElement {
-    const { id } = useParams();
-    if(!id) throw new Error("Housekeeper is undefined.");
+    const { scheduleId, id } = useParams();
+    if(!scheduleId ) throw new Error("Schedule is undefined.");
+    
     const navigate = useNavigate();
     const [housekeeper, setHousekeeper] = useState<Housekeeper>();
     const [rooms, setRooms] = useState<Room[]>([]);
@@ -24,36 +25,39 @@ export default function Index(): ReactElement {
     const [monthYear, setMonthYear] = useState(new Date());
 
     useEffect(() => {
-        axios.get(process.env.REACT_APP_API_URL + "/Housekeepers/Get/" + id)
-        .then(async response => {
-            setHousekeeper(response.data as Housekeeper);
+        if(id){
+            axios.get(process.env.REACT_APP_API_URL + "/Housekeepers/Get/" + id)
+            .then(async response => setHousekeeper(response.data as Housekeeper))
+            .catch(error => console.log(error));
+        }
+
+        axios.get(process.env.REACT_APP_API_URL + "/Rooms/Get/" + scheduleId)
+        .then(async response => {   
+            let rooms = response.data as Room[];
+            // filters out tasks that are not assigned to the housekeeper
+            if(id) rooms.forEach(room => room.housekeepingTasks = room.housekeepingTasks?.filter(task => task.housekeeperId! === parseInt(id)));   
+            setRooms(MapRooms(rooms));
         })
-        .then(() => {
-            if(housekeeper?.scheduleId === undefined) return;
-            axios.get(process.env.REACT_APP_API_URL + "/Rooms/Get/" + housekeeper?.scheduleId)
-            .then(async response => {      
-                setRooms(MapRooms(response.data as Room[]));
-            })
-            .catch(error => console.log(error))
-        }).catch(error => console.log(error));
+        .catch(error => console.log(error));
 
         
-    }, [housekeeper?.scheduleId, id, setRooms, setHousekeeper]);
+    }, [scheduleId, id, setRooms, setHousekeeper]);
 
     return(<>
         <div style={{borderRadius:"5px" }} className="p-3 m-3 mb-2 bg-primary d-flex flex-fill flex-row">
             <MonthYearSelector monthYear={monthYear} onChange={(d) => setMonthYear(d)} />
         </div>
         <div className="p-3 pb-0 d-flex flex-column flex-fill">
-            <Rooms rooms={rooms} monthYear={monthYear} displayGuestNames={false} displayHousekeepingTasks={true} On={onCellClick}/>
+            <Rooms rooms={rooms} monthYear={monthYear} displayGuestNames={false} displayHousekeepingTasks={true} OnCellClick={onCellClick}/>
         </div>
         {modal}
     </>);
 
     function onCellClick(date: Date, room: Room): void {
+        if(id) return;
         const task = (room.housekeepingTasks ?? []).find(task => isSameDay(task.date!, date));
         if(!task) {
-            setModal(<CreateHousekeepingTaskModal date={date} room={room} housekeeper={housekeeper} onSave={onSaveNew} onHide={onHide}/>)
+            setModal(<CreateHousekeepingTaskModal date={date} room={room} onSave={onSaveNew} onHide={onHide}/>)
         }
         else {
             setModal(<HousekeepingTaskModal task={task} onSave={(t) => onSaveExisting(t, task)} onHide={onHide}/>)
@@ -105,5 +109,5 @@ export const page: PageLink = {
     icon: <GiMagicBroom/>    ,
     route: '/housekeeper/tasks',
     element: <Index/>,
-    params: '/:id'
+    params: '/:scheduleId/:id?'
 }

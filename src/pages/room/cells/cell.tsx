@@ -18,11 +18,11 @@ interface Props {
     displayGuestNames: boolean,
     displayHousekeepingTasks: boolean,
 
-    On(date: Date, room: Room): void
+    OnClick(date: Date, room: Room): void
 }
 
-export default function Cell({room, current: date, displayGuestNames, displayHousekeepingTasks, On}: Props): ReactElement {
-    const onClick = () => On(date, room);
+export default function Cell({room, current: date, displayGuestNames, displayHousekeepingTasks, OnClick}: Props): ReactElement {
+    const onClick = () => OnClick(date, room);
     const occupy: Reservation[] =  (room.reservations ?? []).filter(r => (r.checkIn! <= date) && (r.checkOut! >= date));
     const checkIn = occupy.find(r => isSameDay(r.checkIn!, date));
     const checkOut = occupy.find(r => isSameDay(r.checkOut!, date));
@@ -35,8 +35,8 @@ export default function Cell({room, current: date, displayGuestNames, displayHou
                 schedule: room.schedule, 
                 scheduleId: room.scheduleId,
             };
-
-    return(<td style={{overflow:"hidden"}} className={"p-0 d-flex flex-fill" + (date.getDate() % 2 === 0 ? " darken " : "")}>
+    // TODO add condition to add or remove light/darken class when the guest name is visible
+    return(<td style={{overflow:"hidden"}} className={"p-0 d-flex flex-fill" + lightOrDark()}>
         <Reservation/>
         <HousekeepingTask/>
     </td>);
@@ -123,5 +123,11 @@ export default function Cell({room, current: date, displayGuestNames, displayHou
                 default: return(<Fragment/>);
             }
         }
+    }
+
+    function lightOrDark(): string {
+        // this is to fix a visual bug with the guest name and houskeeping task icons
+        const lighten = displayGuestNames ? " " : " lighten ";
+        return date.getDate() % 2 === 0 ? " darken " : lighten;
     }
 }

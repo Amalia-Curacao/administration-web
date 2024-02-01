@@ -37,7 +37,7 @@ function Index(): ReactElement {
             <button onClick={() => navigate(pages["housekeeper index"].route + "/" + id)} className="btn btn-secondary btn-outline-primary float-end">Housekeeping</button>
         </div>
         <div className="p-3 pb-0 d-flex flex-column flex-fill">
-            <Rooms monthYear={monthYear} rooms={rooms} displayGuestNames={true} displayHousekeepingTasks={false} On={onCellClick}/>
+            <Rooms monthYear={monthYear} rooms={rooms} displayGuestNames={true} displayHousekeepingTasks={false} OnCellClick={onCellClick}/>
         </div>
     </>);
     
