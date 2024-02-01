@@ -9,9 +9,8 @@ import { default as Rooms } from "../table";
 import { isSameDay } from "../../../extensions/Date";
 import HousekeepingTask from "../../../models/HousekeepingTask";
 import { FaLongArrowAltLeft, FaLongArrowAltRight } from "react-icons/fa";
-import Housekeeper from "../../../models/Housekeeper";
-import HousekeepingTaskModal, { CreateHousekeepingTaskModal } from "../../housekeepingTask/modal";
 import { ToJsonHousekeepingTask } from "../../../extensions/ToJson";
+import HousekeepingTaskModal, { CreateHousekeepingTaskModal } from "../../housekeepingtask/modal";
 
 
 export default function Index(): ReactElement {
@@ -19,18 +18,11 @@ export default function Index(): ReactElement {
     if(!scheduleId ) throw new Error("Schedule is undefined.");
     
     const navigate = useNavigate();
-    const [housekeeper, setHousekeeper] = useState<Housekeeper>();
     const [rooms, setRooms] = useState<Room[]>([]);
     const [modal, setModal] = useState<ReactElement>(<Fragment/>);
     const [monthYear, setMonthYear] = useState(new Date());
 
     useEffect(() => {
-        if(id){
-            axios.get(process.env.REACT_APP_API_URL + "/Housekeepers/Get/" + id)
-            .then(async response => setHousekeeper(response.data as Housekeeper))
-            .catch(error => console.log(error));
-        }
-
         axios.get(process.env.REACT_APP_API_URL + "/Rooms/Get/" + scheduleId)
         .then(async response => {   
             let rooms = response.data as Room[];
@@ -39,9 +31,7 @@ export default function Index(): ReactElement {
             setRooms(MapRooms(rooms));
         })
         .catch(error => console.log(error));
-
-        
-    }, [scheduleId, id, setRooms, setHousekeeper]);
+    }, [scheduleId, id, setRooms]);
 
     return(<>
         <div style={{borderRadius:"5px" }} className="p-3 m-3 mb-2 bg-primary d-flex flex-fill flex-row">
