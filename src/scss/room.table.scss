@@ -44,7 +44,6 @@ $cell-width: 34px;
 .guest-name {
     position: absolute;
     z-index: 2;
-    margin-top: calc(($cell-height / 3) * -1);
     white-space: nowrap;
     font-size: large;
 }

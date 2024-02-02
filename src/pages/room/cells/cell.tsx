@@ -2,10 +2,6 @@ import { Fragment, ReactElement } from "react";
 import { isSameDay, oldest } from "../../../extensions/Date";
 import Reservation from "../../../models/Reservation";
 import Room from "../../../models/Room";
-import { CheckInCell } from "./checkIn";
-import { CheckOutCell } from "./checkOut";
-import { OccupiedCell } from "./occupied";
-import { OnoccupiedCell } from "./onoccupied";
 import HousekeepingTaskType from "../../../models/enums/HousekeepingTaskType";
 import { FaPlus } from "react-icons/fa6";
 import { FaRegCircle } from "react-icons/fa";
@@ -22,7 +18,6 @@ interface Props {
 }
 
 export default function Cell({room, current: date, displayGuestNames, displayHousekeepingTasks, OnClick}: Props): ReactElement {
-    const onClick = () => OnClick(date, room);
     const occupy: Reservation[] =  (room.reservations ?? []).filter(r => (r.checkIn! <= date) && (r.checkOut! >= date));
     const checkIn = occupy.find(r => isSameDay(r.checkIn!, date));
     const checkOut = occupy.find(r => isSameDay(r.checkOut!, date));
@@ -35,63 +30,60 @@ export default function Cell({room, current: date, displayGuestNames, displayHou
                 schedule: room.schedule, 
                 scheduleId: room.scheduleId,
             };
-    return(<td style={{overflow:"hidden"}} className={"p-0 d-flex flex-fill cell" + darken()}>
-        <Reservation>
-            <HousekeepingTask/>
-        </Reservation>
+    const className = "p-0 d-flex flex-fill no-decoration align-items-center justify-content-around" + darken();
+
+    return(<td className={"d-flex flex-fill p-0 cell" + darken()}>{
+        type().map((t, index) => 
+            <button style={style(index, type().length)} className={className + t} onClick={() => OnClick(date, room)}>
+                <HousekeepingTask/>
+                <GuestName/>
+            </button>)}
     </td>);
 
-    function Reservation({children}:{children: ReactElement}): ReactElement {
+    function style(index: number, length: number): any {
+        if(length === 1) return { };
+        switch(index){
+            case 0:
+                return { marginRight: "-50%" };
+            case 1:
+                return { marginLeft: "-50%" };
+            default:
+                return { };
+        }
+    }
+
+    function type(): string[] {
         switch(true) {
             case occupy.length === 0: 
-                return (<Onoccupied shape="">{children}</Onoccupied>);
-            case checkIn !== undefined && checkOut !== undefined: return(<>
-                <CheckOut/>
-                <CheckIn>{children}</CheckIn>
-            </>);
-            case checkIn !== undefined: return(<>
-                <Onoccupied shape="L">{children}</Onoccupied>
-                <CheckIn/>
-            </>);
-            case checkOut !== undefined: return(<>
-                <CheckOut/>
-                <Onoccupied shape="R">{children}</Onoccupied>
-            </>);
+                return ([" onoccupied "]);
+            case checkIn !== undefined && checkOut !== undefined: 
+                return([" check-out ", " check-in "]);
+            case checkIn !== undefined: 
+                return([" onoccupied ", " check-in "]);
+            case checkOut !== undefined: 
+                return([" check-out ", " onoccupied "]);
             default:
-                return (<Occupied>{children}</Occupied>);
+                return ([" occupied "]);
         }
+    }
 
-        function Onoccupied({shape, children}: {shape: string, children?: ReactElement}): ReactElement {
-            return (<OnoccupiedCell onClick={onClick} shape={shape} classModification={darken()}>{children}</OnoccupiedCell>);
-        }
+    function darken(): string {
+        return date.getDate() % 2 === 0 ? " darken " : "";
+    }
     
-        function CheckIn({children}: {children?: ReactElement}): ReactElement {
-            return (<CheckInCell onClick={onClick} classModification={darken()}>{children}</CheckInCell>);
+    function GuestName() : ReactElement {
+        if(!displayGuestNames || occupy.length === 0) return(<Fragment/>);
+        const occupied = occupy[0];
+        const beginingOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+        const dayAfterCheckIn = new Date(occupied.checkIn!.getFullYear(), occupied.checkIn!.getMonth(), occupied.checkIn!.getDate() + 1);
+        
+        if(isSameDay(date, oldest(beginingOfMonth, dayAfterCheckIn))
+            && occupied.guests!.length > 0) {
+            return(<span className="guest-name">{occupied.guests![0].lastName!}</span>);
         }
+        return(<Fragment/>);
+    } 
     
-        function CheckOut({children}: {children?: ReactElement}): ReactElement {
-            return (<CheckOutCell onClick={onClick} classModification={darken()}>{children}</CheckOutCell>);
-        }
-    
-        function Occupied({children}: {children?: ReactElement}): ReactElement {
-            return(<OccupiedCell onClick={onClick} guestName={GuestName(occupy[0], date)} classModification={darken()}>{children}</OccupiedCell>);
-            
-            function GuestName(occupied: Reservation | undefined, currentDate: Date) : string {
-                if(!occupied || !displayGuestNames) return("");
-    
-                const beginingOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-                const dayAfterCheckIn = new Date(occupied.checkIn!.getFullYear(), occupied.checkIn!.getMonth(), occupied.checkIn!.getDate() + 1);
-                
-                if(isSameDay(currentDate, oldest(beginingOfMonth, dayAfterCheckIn))) {
-                    return( occupied.guests!.length > 0
-                            ? occupied.guests![0].lastName!
-                            : "" );
-                }
-                return("");
-            } 
-        }
-    }    
-
     function HousekeepingTask({size}:{size?: string}): ReactElement {
         if( displayHousekeepingTasks === false ||
             task.type === undefined ||
@@ -116,9 +108,5 @@ export default function Cell({room, current: date, displayGuestNames, displayHou
             default: return(<Fragment/>);
         }
         
-    }
-
-    function darken(): string {
-        return date.getDate() % 2 === 0 ? " darken " : "";
     }
 }
