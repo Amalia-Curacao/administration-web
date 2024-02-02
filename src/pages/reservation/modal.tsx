@@ -1,6 +1,6 @@
 import { ReactElement, useState } from "react";
 import { Modal } from "react-bootstrap";
-import BookingSource from "../../models/BookingSource";
+import BookingSource from "../../models/enums/BookingSource";
 import Guest from "../../models/Guest";
 import Reservation from "../../models/Reservation";
 import Room from "../../models/Room";

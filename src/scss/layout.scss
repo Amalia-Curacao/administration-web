@@ -52,12 +52,4 @@ path {
     border-color: $secondary !important;
 }
 
-.darken {
-    filter: brightness(calc(100% - $darken-percentage));
-}
-
-.lighten {
-    filter: brightness(calc(100% + $darken-percentage));
-}
-
 @import "node_modules/bootstrap/scss/bootstrap";

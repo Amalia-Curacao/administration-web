@@ -9,9 +9,10 @@ import { default as Rooms } from "../table";
 import PageLink from "../../../types/PageLink";
 import Room from "../../../models/Room";
 import Reservation from "../../../models/Reservation";
-import axios from "axios";
 import { MapAll as MapRooms } from "../../../mapping/room";
-import { ToJsonReservation, ToJsonGuest } from "../../../extensions/ToJson";
+import guestsApi from "../../../api/guests";
+import roomsApi from "../../../api/rooms";
+import reservationsApi from "../../../api/reservations";
 
 function Index(): ReactElement {
     const { id } = useParams();
@@ -20,11 +21,8 @@ function Index(): ReactElement {
     const [modal, setModal] = useState<ReactElement>(<Fragment/>);
 
     useEffect(() => {
-        axios.get(process.env.REACT_APP_API_URL + "/Rooms/Get/" + id)
-        .then(async response => {
-            setRooms(MapRooms(response.data as Room[]));
-        })
-        .catch(error => console.log(error));
+        roomsApi.get(parseInt(id))
+            .then(rooms => setRooms(MapRooms(rooms)));
     }, [id]);
 
     const navigate = useNavigate();
@@ -62,35 +60,23 @@ function Index(): ReactElement {
             newR ? onUpdate(newR) : onDelete(oldR)
 
             function onUpdate(reservation: Reservation): void {
-                axios.post(process.env.REACT_APP_API_URL + "/Reservations/Edit", ToJsonReservation(reservation)).then(() => {
-                    axios.put(process.env.REACT_APP_API_URL + "/Guests/Set/" + reservation.id, reservation.guests!.map(ToJsonGuest))
-                    .catch(err => {console.log(err)});
-                })
-                .then(() => navigate(0))
-                .catch(err => {console.log(err)});
+                reservationsApi.update(reservation)
+                    .then(() => guestsApi.set(reservation.id!, reservation.guests!))
+                    .then(() => navigate(0));
             }
 
             function onDelete(reservation: Reservation): void {
-                axios.delete(process.env.REACT_APP_API_URL + "/Reservations/Delete/" + reservation.id)
-                .then(() => navigate(0))
-                .catch(err => {console.log(err)});
+                reservationsApi.delete(reservation.id!)
+                    .then(() => navigate(0));
             }
         }
 
         function onSaveNew(newR: Reservation | undefined): void {
-            newR ? onAdd(newR) : console.log("");
-
-            function onAdd(reservation: Reservation): void {
-                axios.post(process.env.REACT_APP_API_URL + "/Reservations/Create", ToJsonReservation(reservation))
-                .then(response => {
-                    reservation.guests!.forEach(guest => {
-                        axios.post(process.env.REACT_APP_API_URL + "/Guests/Create", ToJsonGuest({...guest, reservationId: (response.data as Reservation).id}))
-                        .catch(err => {console.log(err)});
-                    });
-                })
-                .then(() => navigate(0))
-                .catch(err => {console.log(err)});
-            }
+            newR 
+                ? reservationsApi.create(newR)
+                    .then((r) => newR.guests!.forEach((g) => guestsApi.create({...g, reservationId: r.id}))) 
+                    .then(() => navigate(0))
+                : console.log("");
         }
     }
 }

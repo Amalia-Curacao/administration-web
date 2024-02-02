@@ -4,14 +4,13 @@ import { GiMagicBroom } from "react-icons/gi";
 import { useNavigate, useParams } from "react-router-dom";
 import { MapAll as MapRooms } from "../../../mapping/room";
 import Room from "../../../models/Room";
-import axios from "axios";
 import { default as Rooms } from "../table";
 import { isSameDay } from "../../../extensions/Date";
 import HousekeepingTask from "../../../models/HousekeepingTask";
 import { FaLongArrowAltLeft, FaLongArrowAltRight } from "react-icons/fa";
-import { ToJsonHousekeepingTask } from "../../../extensions/ToJson";
 import HousekeepingTaskModal, { CreateHousekeepingTaskModal } from "../../housekeepingtask/modal";
-
+import roomsApi from "../../../api/rooms";
+import housekeepingTasksApi from "../../../api/housekeepingTasks";
 
 export default function Index(): ReactElement {
     const { scheduleId, id } = useParams();
@@ -23,14 +22,14 @@ export default function Index(): ReactElement {
     const [monthYear, setMonthYear] = useState(new Date());
 
     useEffect(() => {
-        axios.get(process.env.REACT_APP_API_URL + "/Rooms/Get/" + scheduleId)
-        .then(async response => {   
-            let rooms = response.data as Room[];
-            // filters out tasks that are not assigned to the housekeeper
-            if(id) rooms.forEach(room => room.housekeepingTasks = room.housekeepingTasks?.filter(task => task.housekeeperId! === parseInt(id)));   
-            setRooms(MapRooms(rooms));
-        })
-        .catch(error => console.log(error));
+        roomsApi.get(parseInt(scheduleId))
+            .then(rooms => {
+                // filters out tasks that are not assigned to the housekeeper
+                if(id) rooms.forEach(room => room.housekeepingTasks = room.housekeepingTasks?.filter(task => task.housekeeperId! === parseInt(id)));   
+                setRooms(MapRooms(rooms));
+            })
+            .catch(error => console.log(error));
+
     }, [scheduleId, id, setRooms]);
 
     return(<>
@@ -62,24 +61,23 @@ export default function Index(): ReactElement {
                 onHide();
             }
             else{
-                axios.post(process.env.REACT_APP_API_URL + "/HousekeepingTasks/Create/", ToJsonHousekeepingTask(task))
+                housekeepingTasksApi.create(task)
                     .then(() => navigate(0));
             }
         }
 
         function onSaveExisting(task: HousekeepingTask | undefined, oldTask: HousekeepingTask): void {
             if(!task){
-                axios.post(process.env.REACT_APP_API_URL + "/HousekeepingTasks/Delete/", ToJsonHousekeepingTask(oldTask))
-                .then(() => navigate(0));
+                housekeepingTasksApi.delete(oldTask)
+                    .then(() => navigate(0));
             }
             else{
-                axios.post(process.env.REACT_APP_API_URL + "/HousekeepingTasks/Update/", ToJsonHousekeepingTask(task))
-                .then(() => navigate(0));
+                housekeepingTasksApi.update(task)
+                    .then(() => navigate(0));
             }
         }
     }
 }
-
 
 function MonthYearSelector({monthYear, onChange}: {monthYear: Date, onChange: (monthYear: Date) => void }): ReactElement {
     const arrowClass = "me-2 justify-content-center align-content-middle no-decoration bg-primary";

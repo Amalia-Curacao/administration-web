@@ -4,7 +4,7 @@ import "../../scss/reservation.create.scss";
 import References from "../../tools/References";
 import InputField from "../../components/inputField";
 import Room from "../../models/Room";
-import BookingSource from "../../models/BookingSource";
+import BookingSource from "../../models/enums/BookingSource";
 import { ToJsonDateOnly, ToJsonTimeOnly } from "../../extensions/ToJson";
 import { default as MapTimeOnly } from "../../mapping/timeonly";
 import { default as MapDateOnly } from "../../mapping/dateonly";

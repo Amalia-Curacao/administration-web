@@ -44,7 +44,6 @@ $cell-width: 34px;
 .guest-name {
     position: absolute;
     z-index: 2;
-    margin-top: calc(($cell-height / 3) * -1);
     white-space: nowrap;
     font-size: large;
 }
@@ -90,18 +89,25 @@ button.hover-danger:hover{
     filter:brightness(95%);
 }
 
-.housekeeping-task-icon{
-    // if you change the size, you need to change it in cell.tsx as well
-    $housekeeping-task-icon-size: 1.5em;
-    position: absolute;
-
-    right: calc(50% - $housekeeping-task-icon-size / 2);
-    bottom: calc(50% - $housekeeping-task-icon-size / 2);
+.darken.onoccupied, .darken.cell{
+    background: $dark-secondary !important;
 }
 
-.housekeeping-task-container{
-    height: 100%;
-    width: 100%;
+.darken.occupied{
+    background: $dark-occupied !important;
+}
+
+.darken.check-in{
+    background: $dark-check-in !important;
+}
+
+.darken.check-out{
+    background: $dark-check-out !important;
+}
+
+.housekeeping-task-icon {
+    position: absolute;
+    z-index: 2;
 }
 
 // #endregion

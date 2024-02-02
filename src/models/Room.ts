@@ -1,6 +1,6 @@
 import HousekeepingTask from "./HousekeepingTask";
 import Reservation from "./Reservation";
-import RoomType from "./RoomType";
+import RoomType from "./enums/RoomType";
 import Schedule from "./Schedule";
 
 export default interface Room{

@@ -1,7 +1,7 @@
 import { ReactElement } from "react";
 import { Modal } from "react-bootstrap";
 import Guest from "../../models/Guest";
-import PersonPrefix from "../../models/PersonPrefix";
+import PersonPrefix from "../../models/enums/PersonPrefix";
 import Reservation from "../../models/Reservation";
 import {default as GuestPage} from "./page";
 

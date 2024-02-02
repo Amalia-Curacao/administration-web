@@ -1,4 +1,4 @@
-import PersonPrefix from "./PersonPrefix";
+import PersonPrefix from "./enums/PersonPrefix";
 import Reservation from "./Reservation";
 
 export default interface Guest{
