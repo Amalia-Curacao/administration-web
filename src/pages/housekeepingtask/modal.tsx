@@ -3,7 +3,7 @@ import HousekeepingTask from "../../models/HousekeepingTask";
 import Room from "../../models/Room";
 import { default as HousekeepingTaskPage } from "./page";
 import { Modal } from "react-bootstrap";
-import HousekeepingTaskType from "../../models/HousekeepingTaskType";
+import HousekeepingTaskType from "../../models/enums/HousekeepingTaskType";
 
 interface CreateHousekeepingTaskModalProps {
     date: Date,

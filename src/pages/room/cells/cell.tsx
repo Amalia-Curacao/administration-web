@@ -6,7 +6,7 @@ import { CheckInCell } from "./checkIn";
 import { CheckOutCell } from "./checkOut";
 import { OccupiedCell } from "./occupied";
 import { OnoccupiedCell } from "./onoccupied";
-import HousekeepingTaskType from "../../../models/HousekeepingTaskType";
+import HousekeepingTaskType from "../../../models/enums/HousekeepingTaskType";
 import { FaPlus } from "react-icons/fa6";
 import { FaRegCircle } from "react-icons/fa";
 import "../../../scss/room.table.scss";
@@ -35,46 +35,46 @@ export default function Cell({room, current: date, displayGuestNames, displayHou
                 schedule: room.schedule, 
                 scheduleId: room.scheduleId,
             };
-    // TODO add condition to add or remove light/darken class when the guest name is visible
-    return(<td style={{overflow:"hidden"}} className={"p-0 d-flex flex-fill" + lightOrDark()}>
-        <Reservation/>
-        <HousekeepingTask/>
+    return(<td style={{overflow:"hidden"}} className={"p-0 d-flex flex-fill cell" + darken()}>
+        <Reservation>
+            <HousekeepingTask/>
+        </Reservation>
     </td>);
 
-    function Reservation(): ReactElement {
+    function Reservation({children}:{children: ReactElement}): ReactElement {
         switch(true) {
             case occupy.length === 0: 
-                return (<Onoccupied shape=""/>);
+                return (<Onoccupied shape="">{children}</Onoccupied>);
             case checkIn !== undefined && checkOut !== undefined: return(<>
                 <CheckOut/>
-                <CheckIn/>
+                <CheckIn>{children}</CheckIn>
             </>);
             case checkIn !== undefined: return(<>
-                <Onoccupied shape="L"/>
+                <Onoccupied shape="L">{children}</Onoccupied>
                 <CheckIn/>
             </>);
             case checkOut !== undefined: return(<>
                 <CheckOut/>
-                <Onoccupied shape="R"/>
+                <Onoccupied shape="R">{children}</Onoccupied>
             </>);
             default:
-                return (<Occupied/>);
+                return (<Occupied>{children}</Occupied>);
         }
 
-        function Onoccupied({shape}: {shape: string}): ReactElement {
-            return (<OnoccupiedCell onClick={onClick} shape={shape}/>);
+        function Onoccupied({shape, children}: {shape: string, children?: ReactElement}): ReactElement {
+            return (<OnoccupiedCell onClick={onClick} shape={shape} classModification={darken()}>{children}</OnoccupiedCell>);
         }
     
-        function CheckIn(): ReactElement {
-            return (<CheckInCell onClick={onClick}/>);
+        function CheckIn({children}: {children?: ReactElement}): ReactElement {
+            return (<CheckInCell onClick={onClick} classModification={darken()}>{children}</CheckInCell>);
         }
     
-        function CheckOut(): ReactElement {
-            return (<CheckOutCell onClick={onClick}/>);
+        function CheckOut({children}: {children?: ReactElement}): ReactElement {
+            return (<CheckOutCell onClick={onClick} classModification={darken()}>{children}</CheckOutCell>);
         }
     
-        function Occupied(): ReactElement {
-            return(<OccupiedCell onClick={onClick} guestName={GuestName(occupy[0], date)}/>);
+        function Occupied({children}: {children?: ReactElement}): ReactElement {
+            return(<OccupiedCell onClick={onClick} guestName={GuestName(occupy[0], date)} classModification={darken()}>{children}</OccupiedCell>);
             
             function GuestName(occupied: Reservation | undefined, currentDate: Date) : string {
                 if(!occupied || !displayGuestNames) return("");
@@ -92,42 +92,33 @@ export default function Cell({room, current: date, displayGuestNames, displayHou
         }
     }    
 
-    function HousekeepingTask(): ReactElement {
+    function HousekeepingTask({size}:{size?: string}): ReactElement {
         if( displayHousekeepingTasks === false ||
             task.type === undefined ||
             task.type === HousekeepingTaskType.None) return(<Fragment/>);
+        
+        size ??= "1.5em";
+        const className = "housekeeping-task-icon";
+        
+        switch(true) {
+            case task.type === HousekeepingTaskType.Towels: 
+                return(<FaPlus size={size} className={className}/>);
 
-        return(<button className="bg-transparent no-decoration w-100 h-100" onClick={onClick} style={{position: "absolute", zIndex: "2"}}>
-            <div className={"housekeeping-task-container"}>
-                <Icon className={"housekeeping-task-icon"}/>
-            </div>
-        </button>)
+            case task.type === HousekeepingTaskType.Bedsheets:
+                return(<FaRegCircle size={size} className={className}/>);
 
-        function Icon({className}: {className: string}): ReactElement {
-            // if you change the size of the icon, you must also change the size of the container in the scss file room.table.scss
-            const size = "1.5em";
-            switch(true){
-                case task.type === HousekeepingTaskType.Towels: 
-                    return(<>
-                        <FaPlus size={size} className={className}/>
-                    </>);
-                case task.type === HousekeepingTaskType.Bedsheets:
-                    return(<>
-                        <FaRegCircle size={size} className={className}/>
-                    </>);
-                case task.type === HousekeepingTaskType.All:
-                    return(<>
-                        <FaPlus size={size} className={className}/>
-                        <FaRegCircle size={size} className={className}/>
-                    </>);
-                default: return(<Fragment/>);
-            }
+            case task.type === HousekeepingTaskType.All:
+                return(<>
+                    <FaPlus size={size} className={className}/>
+                    <FaRegCircle size={size} className={className}/>
+                </>);
+
+            default: return(<Fragment/>);
         }
+        
     }
 
-    function lightOrDark(): string {
-        // this is to fix a visual bug with the guest name and houskeeping task icons
-        const lighten = displayGuestNames ? " " : " lighten ";
-        return date.getDate() % 2 === 0 ? " darken " : lighten;
+    function darken(): string {
+        return date.getDate() % 2 === 0 ? " darken " : "";
     }
 }

@@ -2,7 +2,7 @@ import { ReactElement, useEffect, useState } from "react";
 import InputField from "../../components/inputField";
 import HousekeepingTask from "../../models/HousekeepingTask";
 import References from "../../tools/References";
-import HousekeepingTaskType from "../../models/HousekeepingTaskType";
+import HousekeepingTaskType from "../../models/enums/HousekeepingTaskType";
 import axios from "axios";
 import Housekeeper from "../../models/Housekeeper";
 

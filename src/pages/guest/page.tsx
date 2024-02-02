@@ -1,7 +1,7 @@
 import { ReactElement, Fragment } from "react";
 import Guest from "../../models/Guest";
 import References from "../../tools/References";
-import PersonPrefix from "../../models/PersonPrefix";
+import PersonPrefix from "../../models/enums/PersonPrefix";
 import InputField from "../../components/inputField";
 
 const references: References = new References();

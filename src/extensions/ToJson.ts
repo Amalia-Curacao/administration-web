@@ -1,10 +1,10 @@
-import BookingSource from "../models/BookingSource";
+import BookingSource from "../models/enums/BookingSource";
 import Guest from "../models/Guest";
 import HousekeepingTask from "../models/HousekeepingTask";
-import HousekeepingTaskType from "../models/HousekeepingTaskType";
-import PersonPrefix from "../models/PersonPrefix";
+import HousekeepingTaskType from "../models/enums/HousekeepingTaskType";
+import PersonPrefix from "../models/enums/PersonPrefix";
 import Reservation from "../models/Reservation";
-import RoomType from "../models/RoomType";
+import RoomType from "../models/enums/RoomType";
 // Purpose
 // ToJson: converts an object to a json string
 // ToJsonReservation: converts a reservation object to a json string

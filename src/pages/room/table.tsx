@@ -1,7 +1,7 @@
 import { Fragment, ReactElement } from "react";
 import { isSameDay } from "../../extensions/Date";
 import Room from "../../models/Room";
-import RoomType from "../../models/RoomType";
+import RoomType from "../../models/enums/RoomType";
 import { MdBedroomParent } from "react-icons/md";
 import Cells from "./cells/cells";
 import "../../scss/room.table.scss";
@@ -26,7 +26,7 @@ export default function Table({rooms, monthYear, displayGuestNames, displayHouse
                 <Dates index={index} monthYear={monthYear} roomType={roomType}/>
                 <tbody>
                     { groupedRooms[roomType].map((r, index) => 
-                    <tr style={{overflow:"visible"}} className="darken-on-hover" key={index}>
+                    <tr style={{overflow:"visible"}} key={index}>
                         <td className="flipped text-center">{r.number}</td>
                         <Cells 
                             key={index} 

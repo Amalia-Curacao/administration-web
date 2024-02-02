@@ -1,6 +1,6 @@
-import BookingSource from "./BookingSource";
+import BookingSource from "./enums/BookingSource";
 import Room from "./Room";
-import RoomType from "./RoomType";
+import RoomType from "./enums/RoomType";
 import Schedule from "./Schedule";
 import Guest from "./Guest";
 
