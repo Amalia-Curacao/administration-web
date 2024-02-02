@@ -12,7 +12,6 @@ import HousekeepingTaskModal, { CreateHousekeepingTaskModal } from "../../housek
 import roomsApi from "../../../api/rooms";
 import housekeepingTasksApi from "../../../api/housekeepingTasks";
 
-
 export default function Index(): ReactElement {
     const { scheduleId, id } = useParams();
     if(!scheduleId ) throw new Error("Schedule is undefined.");
@@ -30,6 +29,7 @@ export default function Index(): ReactElement {
                 setRooms(MapRooms(rooms));
             })
             .catch(error => console.log(error));
+
     }, [scheduleId, id, setRooms]);
 
     return(<>
@@ -78,7 +78,6 @@ export default function Index(): ReactElement {
         }
     }
 }
-
 
 function MonthYearSelector({monthYear, onChange}: {monthYear: Date, onChange: (monthYear: Date) => void }): ReactElement {
     const arrowClass = "me-2 justify-content-center align-content-middle no-decoration bg-primary";
