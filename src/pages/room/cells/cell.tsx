@@ -34,7 +34,7 @@ export default function Cell({room, current: date, displayGuestNames, displayHou
 
     return(<td className={"d-flex flex-fill p-0 cell" + darken()}>{
         type().map((t, index) => 
-            <button style={style(index, type().length)} className={className + t} onClick={() => OnClick(date, room)}>
+            <button key={index} style={style(index, type().length)} className={className + t} onClick={() => OnClick(date, room)}>
                 <HousekeepingTask/>
                 <GuestName/>
             </button>)}
