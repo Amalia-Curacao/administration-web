@@ -149,10 +149,7 @@ function Action(reservation: Reservation, rooms: Room[]): Reservation | undefine
         bookingSource: BookingSource[references.GetSelect("booking-source")!.current?.value! as keyof typeof BookingSource],
         remarks: references.GetInput("remarks")!.current?.value!,
 
-        scheduleId: reservation.scheduleId,
         roomNumber: parseInt(references.GetInput("room-number")!.current?.value!),
-        schedule: undefined,
-
         roomType: reservation.roomType,
         roomScheduleId: reservation.roomScheduleId,
         room: undefined,
@@ -212,7 +209,6 @@ function CanFit(reservation: Reservation, room: Room): boolean {
 }
 
 export default function Page(reservation: Reservation, rooms: Room[]): {body: ReactElement, action: () => Reservation | undefined} {
-    if(!reservation.scheduleId) throw new Error("Reservation scheduleId is undefined");
     if(!reservation.roomScheduleId) throw new Error("Reservation roomScheduleId is undefined");
     if(!reservation.roomType) throw new Error("Reservation roomType is undefined");
     if(!rooms) throw new Error("Rooms is undefined");

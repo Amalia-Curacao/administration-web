@@ -1,12 +1,12 @@
 import HousekeepingTask from "./HousekeepingTask";
-import Schedule from "./Schedule";
+import ScheduleInviteLinks from "./ScheduleInviteLinks";
 
-export default interface Housekeeper {
+export default interface User {
     id?: number;
+    auth0?: string;
     firstName?: string;
     lastName?: string;
     note?: string;
     tasks?: HousekeepingTask[];
-    scheduleId?: number;
-    schedule?: Schedule;
+    invites?: ScheduleInviteLinks[];
 }

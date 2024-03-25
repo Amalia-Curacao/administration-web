@@ -1,11 +1,12 @@
 import PageLink from "./types/PageLink";
-import { page as SchedulesPage } from "./pages/schedule/main";
+import { page as SchedulesPage } from "./pages/schedule/page";
 import { page as RoomsPage } from "./pages/room/reservations/index";
 import { page as HousekeepersPage } from "./pages/housekeeper/index";
 import { page as HousekepersTaskPage } from "./pages/room/housekeepingTasks/index";
-import { RouteObject } from "react-router-dom";
 import Logo from "./svgs/logo";
 import colors from "./scss/colors.module.scss";
+import { ReactElement } from "react";
+import { Route } from "react-router-dom";
 
 export const defaultPage: PageLink = {
     route: "/",
@@ -13,7 +14,6 @@ export const defaultPage: PageLink = {
     params: SchedulesPage.params,
     icon: <Logo primaryColor={colors.secondary} secondaryColor={colors.secondary} borderColor="none"/>
 }
-
 
 export const pages: { [id: string]: PageLink; } = {
     "default": defaultPage,
@@ -23,12 +23,8 @@ export const pages: { [id: string]: PageLink; } = {
     "housekeeping tasks": HousekepersTaskPage
 };
 
-export default function RouteObjects(): RouteObject[] {
-    return (Object.values(pages).map(page => {
-        return {
-            path: page.route + (page.params ?? ""),
-            element: page.element,
-            replace: true,
-        };
-    }));
+export default function Routes(): ReactElement {
+    return(<>
+        {Object.values(pages).map((page, i) => <Route key={i} path={page.route + (page.params ?? "")} element={page.element}/>)}
+    </>);
 }

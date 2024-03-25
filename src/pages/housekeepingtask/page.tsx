@@ -4,16 +4,16 @@ import HousekeepingTask from "../../models/HousekeepingTask";
 import References from "../../tools/References";
 import HousekeepingTaskType from "../../models/enums/HousekeepingTaskType";
 import axios from "axios";
-import Housekeeper from "../../models/Housekeeper";
+import User from "../../models/User";
 
 const references = new References();
 
 function Body({task}: {task: HousekeepingTask}): ReactElement {
-    const [housekeepers, setHousekeepers] = useState<Housekeeper[]>([]);
+    const [housekeepers, setHousekeepers] = useState<User[]>([]);
     useEffect(() => {
         axios.get(process.env.REACT_APP_API_URL + "/Housekeepers/GetAll/" + task.scheduleId)
         .then(async response => {
-            setHousekeepers(response.data as Housekeeper[]);
+            setHousekeepers(response.data as User[]);
         })
         .catch(error => console.log(error));
     }, [task.scheduleId, setHousekeepers]);

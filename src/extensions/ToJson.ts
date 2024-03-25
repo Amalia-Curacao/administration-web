@@ -36,8 +36,7 @@ export function ToJsonReservation(reservation: Reservation): any{
         flightArrivalTime: !reservation.flightArrivalTime ? undefined : ToJsonTimeOnly(reservation.flightArrivalTime),
         flightDepartureNumber: reservation.flightDepartureNumber,
         flightDepartureTime: !reservation.flightDepartureTime ? undefined : ToJsonTimeOnly(reservation.flightDepartureTime),
-        schedule: undefined,
-        scheduleId: reservation.scheduleId,
+
         remarks: reservation.remarks,
     };
 }

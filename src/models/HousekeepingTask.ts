@@ -1,6 +1,6 @@
 import Room from "./Room";
 import Schedule from "./Schedule";
-import Housekeeper from "./Housekeeper";
+import User from "./User";
 import HousekeepingTaskType from "./enums/HousekeepingTaskType";
 
 export default interface HousekeepingTask {
@@ -14,6 +14,6 @@ export default interface HousekeepingTask {
     schedule?: Schedule,
     scheduleId?: number,
     
-    housekeeper?: Housekeeper
+    housekeeper?: User
     housekeeperId?: number,
 }

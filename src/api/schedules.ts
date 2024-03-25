@@ -1,26 +1,27 @@
-import axios from "axios";
 import Schedule from "../models/Schedule";
+import Api from "./api";
 
-const schedulesApi = {
-    getAll: () : Promise<Schedule[]> =>
-        axios.get(process.env.REACT_APP_API_URL + "/Schedules/Get")
-            .then(response => response.data),
+export default class SchedulesApi{
+    baseUrl: string = `${process.env.REACT_APP_API_URL}/Schedules`;
+    api : Api;
 
-    get: (scheduleId: number) : Promise<Schedule> =>
-        axios.get(process.env.REACT_APP_API_URL + "/Schedules/Get/" + scheduleId)
-            .then(response => response.data),
+    constructor(token: string){
+        this.api = new Api(token);
+    }
 
-    create: (scheduleName: string) : Promise<Schedule> =>
-        axios.get(process.env.REACT_APP_API_URL + "/Schedules/Create/" + scheduleName)
-            .then(response => response.data),
-    
-    update: (schedule: Schedule) : Promise<Schedule> =>
-        axios.post(process.env.REACT_APP_API_URL + "/Schedules/Update", schedule)
-            .then(response => response.data),
+    async get() : Promise<Schedule[]> {
+        return await this.api.get(`${this.baseUrl}/Get`);
+    }
 
-    delete: (scheduleId: number) : Promise<boolean> =>
-        axios.delete(process.env.REACT_APP_API_URL + "/Schedules/Delete/" + scheduleId)
-            .then(response => response.data),
+    async create(scheduleName: string) : Promise<Schedule> {
+        return await this.api.get(`${this.baseUrl}/Create/${scheduleName}`);
+    }
+
+    async update(schedule: Schedule) : Promise<Schedule> {
+        return await this.api.post(`${this.baseUrl}/Update`, schedule);
+    }
+
+    async delete(scheduleId: number) : Promise<boolean>{
+        return await this.api.delete(`${this.baseUrl}/Delete/${scheduleId}`);
+    }
 }
-
-export default schedulesApi;

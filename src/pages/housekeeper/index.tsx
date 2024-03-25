@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Fragment, ReactElement, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import Housekeeper from "../../models/Housekeeper";
+import User from "../../models/User";
 import Row, { CreateRow } from "./row";
 import PageLink from "../../types/PageLink";
 import { pages } from "../../routes";
@@ -10,14 +10,14 @@ function Body(): ReactElement {
     const {id} = useParams();
     if(!id) throw new Error("Schedule ID is undefined.");
     const navigate = useNavigate();
-    const [housekeepers, setHousekeepers] = useState<Housekeeper[]>([]);
-    const [modifying, setModifying] = useState<Housekeeper | undefined>(undefined);
+    const [housekeepers, setHousekeepers] = useState<User[]>([]);
+    const [modifying, setModifying] = useState<User | undefined>(undefined);
     const [createRow, setCreateRow] = useState<ReactElement>(<></>);
     
     useEffect(() => {
         axios.get(process.env.REACT_APP_API_URL + "/Housekeepers/GetAll/" + id)
         .then(response => {
-            setHousekeepers(response.data as Housekeeper[]);
+            setHousekeepers(response.data as User[]);
         })
         .catch(error => console.log(error));
     }, [id]);
@@ -62,13 +62,13 @@ function Body(): ReactElement {
                 <tbody>
                     {createRow}
                     {housekeepers.map((h, index) => 
-                        <Row key={h.id} index={index} housekeeper={h} readOnly={isReadonly(h)} onEdit={() => onEdit(h)} onSave={(h: Housekeeper) => editHousekeeper(h)} onDelete={() => onDelete(h)}/>)}
+                        <Row key={h.id} index={index} housekeeper={h} readOnly={isReadonly(h)} onEdit={onEdit} onSave={editHousekeeper} onDelete={onDelete} onDetails={onDetails}/>)}
                 </tbody>
             </table>
         </div>
     </>;
 
-    function onEdit(h: Housekeeper): boolean {
+    function onEdit(h: User): boolean {
         if(modifying === undefined) {
             setModifying(h);
             return true;
@@ -76,16 +76,20 @@ function Body(): ReactElement {
         return false;
     }
 
-    function editHousekeeper(housekeeper: Housekeeper): void {
+    function editHousekeeper(housekeeper: User): void {
         setHousekeepers(housekeepers.map(h => h.id === housekeeper.id ? housekeeper : h));
         setModifying(undefined);
     }
 
-    function onDelete(housekeeper: Housekeeper): void {
+    function onDelete(housekeeper: User): void {
         setHousekeepers(housekeepers.filter(h => h.id !== housekeeper.id));
     }
 
-    function isReadonly(housekeeper: Housekeeper): boolean{
+    function onDetails(housekeeper: User): void {
+        navigate(pages["housekeeping tasks"].route + "/" + id + "/" + housekeeper.id!)
+    }
+
+    function isReadonly(housekeeper: User): boolean{
         if(modifying === undefined) return true;
         return modifying.id !== housekeeper.id;
     }
@@ -93,7 +97,7 @@ function Body(): ReactElement {
     function displayCreateRow(): void {
         setCreateRow(<CreateRow scheduleId={parseInt(id!)} onSave={addHousekeeper} onReturn={hideCreateRow}/>);
 
-        function addHousekeeper(housekeeper: Housekeeper): void {
+        function addHousekeeper(housekeeper: User): void {
             setHousekeepers([...housekeepers, {...housekeeper}]);
             hideCreateRow();
         }

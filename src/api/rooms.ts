@@ -1,27 +1,25 @@
-import axios from "axios";
 import Room from "../models/Room";
-import { MapAll } from "../mapping/room";
+import Api from "./api";
 
-const roomsApi = {
-    get: (scheduleId: number) : Promise<Room[]> =>
-        axios.get(process.env.REACT_APP_API_URL + "/Rooms/Get/" + scheduleId)
-              .then(response => MapAll(response.data)), 
+export default class RoomsApi {
+    baseUrl: string = `${process.env.REACT_APP_API_URL}/Rooms`;
+    api : Api;
 
- /* get: (roomNumber: number, scheduleId: number) : Promise<Room> =>
-        axios.get(process.env.REACT_APP_API_URL + "/Rooms/Get/" + roomNumber + "/" + scheduleId)
-              .then(response => Map(response.data)), */
+    constructor(token: string){
+        this.api = new Api(token);
+    }
+    
+    async get(scheduleId: number) : Promise<Room[]> {
+        return await this.api.get(`${this.baseUrl}/Get/${scheduleId}`);
+    }
+    async create(room: Room) : Promise<Room> {
+        return await this.api.post(`${this.baseUrl}/Create`, room);
+    }
+    async update(room: Room) : Promise<Room> {
+        return await this.api.post(`${this.baseUrl}/Update`, room);
+    }
+    async delete(roomNumber: number, roomScheduleId: number) : Promise<boolean>{
+        return await this.api.delete(`${this.baseUrl}/Delete/${roomNumber}/${roomScheduleId}`);
+    }
 
- /* create: (room: Room) : Promise<Room> =>
-        axios.post(process.env.REACT_APP_API_URL + "/Rooms/Create", room)
-              .then(response => Map(response.data)), */
-
- /* update: (room: Room) : Promise<Room> =>
-        axios.post(process.env.REACT_APP_API_URL + "/Rooms/Update", room)
-              .then(response => Map(response.data)), */
-
- /* delete: (roomNumber: number, roomScheduleId: number) : Promise<boolean> =>
-        axios.delete(process.env.REACT_APP_API_URL + "/Rooms/Delete/" + roomNumber + "/" + roomScheduleId)
-              .then(response => response.data), */
 }
-
-export default roomsApi;

@@ -1,19 +1,18 @@
 import { Fragment, ReactElement, useEffect, useState } from "react";
-import Housekeeper from "../../models/Housekeeper";
+import User from "../../models/User";
 import References from "../../tools/References";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { pages } from "../../routes";
 
 const references = new References();
 
-export default function Row({housekeeper, readOnly, index, onEdit, onSave, onDelete}: {housekeeper: Housekeeper, readOnly: boolean, index: number, onEdit: () => boolean, onSave: (h: Housekeeper) => void, onDelete: (h: Housekeeper) => void}): ReactElement {
+export default function Row({housekeeper, readOnly, index, onEdit, onSave, onDelete, onDetails}: {housekeeper: User, readOnly: boolean, index: number, onEdit: (h: User) => boolean, onSave: (h: User) => void, onDelete: (h: User) => void, onDetails: (h: User) => void}): ReactElement {
     const bgModifier = index % 2 === 0 ? " darken " : " lighten ";    
     const navigate = useNavigate();
     const [actions, setActions] = useState<ReactElement>();
     useEffect(() => {
         if(!readOnly) setActions(<SaveGroup onSave={updateHousekeeper} onReturn={onReturn}/>);
-        else setActions(<ActionGroup onEdit={onEdit} onDelete={deleteHousekeeper} onDetails={() => navigate(pages["housekeeping tasks"].route + "/" + housekeeper.scheduleId! + "/" + housekeeper.id!)}/>);
+        else setActions(<ActionGroup onEdit={() => onEdit(housekeeper)} onDelete={deleteHousekeeper} onDetails={() => onDetails(housekeeper)}/>);
 
         function deleteHousekeeper(): void {
             axios.delete(process.env.REACT_APP_API_URL + "/Housekeepers/Delete/" + housekeeper.id)
@@ -22,7 +21,7 @@ export default function Row({housekeeper, readOnly, index, onEdit, onSave, onDel
         }
     
         function updateHousekeeper(): void {
-            const toEdit: Housekeeper = {
+            const toEdit: User = {
                 ...housekeeper,
                 firstName: references.GetInput("first-name").current?.value,
                 lastName: references.GetInput("last-name").current?.value,
@@ -30,7 +29,7 @@ export default function Row({housekeeper, readOnly, index, onEdit, onSave, onDel
             };
             if(JSON.stringify(housekeeper) !== JSON.stringify(toEdit)) {
                 axios.post(process.env.REACT_APP_API_URL + "/Housekeepers/Edit", toEdit)
-                    .then(response => onSave(response.data as Housekeeper))
+                    .then(response => onSave(response.data as User))
                     .catch(error => console.log(error));
             }
             else {
@@ -42,7 +41,7 @@ export default function Row({housekeeper, readOnly, index, onEdit, onSave, onDel
             setActions(<SaveGroup onSave={updateHousekeeper} onReturn={onReturn}/>);
             onSave(housekeeper);
         }
-    }, [housekeeper, readOnly, onEdit, onSave, onDelete, navigate]);
+    }, [housekeeper, readOnly, onEdit, onSave, onDelete, navigate, onDetails]);
 
     return (<tr className={bgModifier}>
         { readOnly ? <ReadonlyFields housekeeper={housekeeper}/> : <InputFields housekeeper={housekeeper}/> }
@@ -52,14 +51,12 @@ export default function Row({housekeeper, readOnly, index, onEdit, onSave, onDel
     </tr>);
 }
 
-export function CreateRow({scheduleId, onSave, onReturn}: {scheduleId: number, onSave: (h: Housekeeper) => void, onReturn: VoidFunction}): ReactElement {
-    const toAdd: Housekeeper = {
+export function CreateRow({scheduleId, onSave, onReturn}: {scheduleId: number, onSave: (h: User) => void, onReturn: VoidFunction}): ReactElement {
+    const toAdd: User = {
         id: -1,
         firstName: "",
         lastName: "",
         note: "",
-        scheduleId: scheduleId,
-        schedule: undefined,
         tasks: []
     }
     return (<tr>
@@ -78,7 +75,7 @@ export function CreateRow({scheduleId, onSave, onReturn}: {scheduleId: number, o
     </tr>);
 
     function createHousekeeper(): void {
-        const toCreate: Housekeeper = {
+        const toCreate: User = {
             ...toAdd,
             firstName: references.GetInput("first-name").current?.value,
             lastName: references.GetInput("last-name").current?.value,
@@ -87,7 +84,7 @@ export function CreateRow({scheduleId, onSave, onReturn}: {scheduleId: number, o
         
         axios.post(process.env.REACT_APP_API_URL + "/Housekeepers/Create", toCreate)
             .then(response => {
-                onSave(response.data[0] as Housekeeper)
+                onSave(response.data[0] as User)
             })
             .catch(error => console.log(error));
     }
@@ -108,7 +105,7 @@ function ActionGroup({ onEdit, onDelete, onDetails}: { onEdit: VoidFunction, onD
     </div>);
 }
 
-function InputFields({housekeeper}: {housekeeper: Housekeeper}): ReactElement {
+function InputFields({housekeeper}: {housekeeper: User}): ReactElement {
     return (<>
         <td className="bg-primary darken">
             <input className="form-control" ref={references.GetInput("first-name")} defaultValue={housekeeper.firstName} type="text"/>
@@ -122,7 +119,7 @@ function InputFields({housekeeper}: {housekeeper: Housekeeper}): ReactElement {
     </>);
 }
 
-function ReadonlyFields({housekeeper}: {housekeeper: Housekeeper}): ReactElement {
+function ReadonlyFields({housekeeper}: {housekeeper: User}): ReactElement {
     return (<>
         <td className="bg-primary">
             <span className="text-secondary">{housekeeper.firstName}</span>

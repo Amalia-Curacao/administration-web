@@ -10,20 +10,31 @@ import PageLink from "../../../types/PageLink";
 import Room from "../../../models/Room";
 import Reservation from "../../../models/Reservation";
 import { MapAll as MapRooms } from "../../../mapping/room";
-import guestsApi from "../../../api/guests";
-import roomsApi from "../../../api/rooms";
-import reservationsApi from "../../../api/reservations";
+import ReservationsApi from "../../../api/reservations";
+import RoomsApi from "../../../api/rooms";
+import { useAuth0 } from "@auth0/auth0-react";
+import GuestsApi from "../../../api/guests";
 
 function Index(): ReactElement {
     const { id } = useParams();
     if(!id) throw new Error("Schedule ID is undefined.");
+    const { getAccessTokenSilently } = useAuth0();
     const [rooms, setRooms] = useState<Room[]>([]);
     const [modal, setModal] = useState<ReactElement>(<Fragment/>);
+    const [roomApi, setRoomApi] = useState<RoomsApi>();
+    const [reservationApi, setReservationsApi] = useState<ReservationsApi>();  
+    const [guestApi, setGuestsApi] = useState<GuestsApi>();
 
     useEffect(() => {
-        roomsApi.get(parseInt(id))
-            .then(rooms => setRooms(MapRooms(rooms)));
-    }, [id]);
+        getAccessTokenSilently()
+            .then(token => {
+                setRoomApi(new RoomsApi(token));
+                setReservationsApi(new ReservationsApi(token));
+                setGuestsApi(new GuestsApi(token));
+            })
+            .then(() => roomApi!.get(parseInt(id))
+                .then(rooms => setRooms(MapRooms(rooms))));
+    }, [getAccessTokenSilently, id, roomApi, setRoomApi, setRooms, setReservationsApi, setGuestsApi]);
 
     const navigate = useNavigate();
     const [monthYear, setMonthYear] = useState(new Date());
@@ -60,21 +71,24 @@ function Index(): ReactElement {
             newR ? onUpdate(newR) : onDelete(oldR)
 
             function onUpdate(reservation: Reservation): void {
-                reservationsApi.update(reservation)
-                    .then(() => guestsApi.set(reservation.id!, reservation.guests!))
+                if(!reservationApi || !guestApi) return;
+                reservationApi.update(reservation)
+                    .then(() => guestApi.set(reservation.id!, reservation.guests!))
                     .then(() => navigate(0));
             }
 
             function onDelete(reservation: Reservation): void {
-                reservationsApi.delete(reservation.id!)
+                if(!reservationApi) return;
+                reservationApi.delete(reservation.id!)
                     .then(() => navigate(0));
             }
         }
 
         function onSaveNew(newR: Reservation | undefined): void {
+            if(!reservationApi || !guestApi) return;
             newR 
-                ? reservationsApi.create(newR)
-                    .then((r) => newR.guests!.forEach((g) => guestsApi.create({...g, reservationId: r.id}))) 
+                ? reservationApi.create(newR)
+                    .then((r) => newR.guests!.forEach((g) => guestApi.create({...g, reservationId: r.id}))) 
                     .then(() => navigate(0))
                 : console.log("");
         }

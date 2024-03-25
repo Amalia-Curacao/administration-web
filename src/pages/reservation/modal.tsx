@@ -31,8 +31,6 @@ export function CreateReservationModal({checkIn, room, rooms, onSave, onHide}: C
         roomType: room.type,
         roomScheduleId: room.scheduleId,
         room: room,
-        scheduleId: room.scheduleId,
-        schedule: room.schedule,
         guests: []
     };
 
