@@ -1,12 +1,10 @@
-import { ReactElement, useState, useEffect, Fragment, useRef, useMemo } from "react";
+import { ReactElement, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import UserApi from "../../../api/users";
 import SaveButton from "../../../components/saveButton";
 import Schedule from "../../../models/Schedule";
 import { pages } from "../../../routes";
 import References from "../../../tools/References";
 import { default as State } from "../../../types/PageState";
-import { useAuth0 } from "@auth0/auth0-react";
 
 interface RowProps {
     schedule: Schedule;
@@ -15,32 +13,16 @@ interface RowProps {
  }
 
 export function ScheduleRow({schedule, update, remove}: RowProps): ReactElement {    
-    const { isLoading, isAuthenticated, getAccessTokenSilently, loginWithRedirect } = useAuth0();
-    const [role, setRole] = useState<string>("");
-    const userApi = useRef<UserApi>();
-
+    if(!schedule.role) throw Error("schedule.Role is undefined");
     const scheduleRowEdit = <InputScheduleRow 
         schedule={schedule} 
         onReturn={() => updateRow(State.Default)}
         onSave={update}/>;
 
-    const scheduleRowIndex = useMemo(() => 
-        <ScheduleRowIndex schedule={schedule} role={role} remove={remove} update={update}/>, 
-        [schedule, role, remove, update]);
+    const scheduleRowIndex = <ScheduleRowIndex schedule={schedule} role={schedule.role} remove={remove} update={update}/>;
         
     
     const [row, setRow] = useState<ReactElement>(scheduleRowIndex);
-
-    useEffect(() => {
-        getAccessTokenSilently().then(token => { userApi.current = new UserApi(token) } )
-        .then(() => userApi.current!.role(schedule.id).then(r => setRole(r)).catch(e => console.error(e)))
-        .then(() => setRow(scheduleRowIndex));
-    }, [setRole, setRow, userApi, getAccessTokenSilently, schedule.id, scheduleRowIndex]);
-
-    if(isLoading) return <Fragment/>;
-    if(!isAuthenticated) { loginWithRedirect(); return <Fragment/>; }
-
-    
 
     function updateRow(changeTo: State){
         switch (changeTo) {
