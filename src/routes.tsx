@@ -7,11 +7,12 @@ import Logo from "./svgs/logo";
 import colors from "./scss/colors.module.scss";
 import { ReactElement } from "react";
 import { Route } from "react-router-dom";
+import RoleRouter from "./pages/schedule/roleRouter";
 
 export const defaultPage: PageLink = {
     route: "/",
-    element: SchedulesPage.element,
-    params: SchedulesPage.params,
+    element: <RoleRouter/>,
+    params: "",
     icon: <Logo primaryColor={colors.secondary} secondaryColor={colors.secondary} borderColor="none"/>
 }
 
