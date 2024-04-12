@@ -9,6 +9,7 @@ import useAuthentication from "../../authentication/useAuthentication";
 import HousekeepersApi from "../../api/housekeepers";
 import ScheduleInviteLinkApi from "../../api/scheduleInviteLink";
 import UserRoles from "../../models/enums/UserRoles";
+import InviteLinkField from "../../components/inviteLinkField";
 
 function Body(): ReactElement {
     const {id} = useParams();
@@ -64,13 +65,11 @@ function Body(): ReactElement {
                         </th>
                         <th>
                             <div className="d-flex flex-row float-end pe-3">
-                                <div className="input-group">
-                                    <input className="form-control text-secondary bg-transparent text-center p-2"value={`Housekeeper invite link:`}/>
-                                    <input className="form-control" type="text" value={inviteLink} readOnly/>
+                                <InviteLinkField inviteLink={inviteLink} displayText="Housekeeper invite code:">
                                     <button onClick={() => navigate(`${pages["housekeeping tasks"].route}/${id}`)} className="btn btn-outline-warning">
                                         All
                                     </button>
-                                </div>
+                                </InviteLinkField>
                             </div>
                         </th>
                     </tr>

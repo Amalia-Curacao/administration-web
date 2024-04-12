@@ -31,6 +31,11 @@ export default function TableHeader({setCreating, isCreating, isAdmin}: TableHea
                     Role
                 </span>
             </th>
+            <th className="table-bordered bg-secondary">
+                <span className="text-dark">
+                    Owner(s)
+                </span>
+            </th>
             <th className="bg-secondary">
                 {extraHeader}
             </th>

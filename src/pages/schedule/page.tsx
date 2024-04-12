@@ -18,8 +18,9 @@ const _info = {name: "Schedules", icon: <GrSchedules/>};
 function Page(): ReactElement {
     const { isLoading } = useAuth0();
     const { getAccessToken } = useAuthentication();
-    const [schedules, setSchedules] = useState<Schedule[]>([]);
+    const [schedules, setSchedules] = useState<Schedule[]>();
     const [isAdmin, setIsAdmin] = useState<boolean>(false);
+    const [isCreating, setIsCreating] = useState<boolean>(false);
     const schedulesApi = useRef<SchedulesApi>();
     const scheduleInviteLinkApi = useRef<ScheduleInviteLinkApi>();
     const userApi = useRef<UserApi>();
@@ -33,35 +34,39 @@ function Page(): ReactElement {
                 scheduleInviteLinkApi.current = new ScheduleInviteLinkApi(token);
             })
             .then(() => {
-                schedulesApi.current!.get().then(setSchedules);
                 userApi.current!.role().then(r => setIsAdmin(r === UserRoles.Admin));
+                if(!schedules) schedulesApi.current!.get().then(setSchedules);
             })
             .catch(e => console.error(e));
-    }, [getAccessToken, schedulesApi, userApi]);
+    }, [getAccessToken, setSchedules, schedules, schedulesApi, userApi]);
 
     if(isLoading) return <LoadingIcon/>;
     
     return (<div className="p-3 pe-3 d-flex flex-column flex-fill">
-        <Table schedules={schedules} On={On} isAdmin={isAdmin}/>
+        {schedules && <Table schedules={schedules} isAdmin={isAdmin} isCreating={isCreating} On={On} Set={Set}/>}
     </div>);
 
     function On(schedule: Schedule) {
         if(!schedulesApi.current) return { create: () => {}, update: () => {}, remove: () => {} };
         const create = () =>  {
             schedulesApi.current!.create(schedule.name!)
-                .then(newS => setSchedules([...schedules, newS]));
+                .then(newS => setSchedules([...schedules ?? [], newS]));
         };
         const update = () => {
             schedulesApi.current!.update(schedule).then(() => nav(0));
         };
         const remove = () => {
             if(isAdmin) schedulesApi.current!.delete(schedule.id!)
-                .then(isDeleted => isDeleted ? setSchedules(schedules.filter(s => s.id !== schedule.id)) : {});
+                .then(isDeleted => isDeleted ? setSchedules((schedules ?? []).filter(s => s.id !== schedule.id)) : {});
             else scheduleInviteLinkApi.current!.revoke(schedule.id!)
-                .then(isDeleted => isDeleted ? setSchedules(schedules.filter(s => s.id !== schedule.id)) : {});
+                .then(isDeleted => isDeleted ? setSchedules((schedules ?? []).filter(s => s.id !== schedule.id)) : {});
         };
         return {create, update, remove};
 
+    }
+
+    function Set() {
+        return {create: () => setIsCreating(true), default: () => setIsCreating(false)};
     }
 }
 

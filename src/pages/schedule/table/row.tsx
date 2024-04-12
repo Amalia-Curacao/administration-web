@@ -14,14 +14,13 @@ interface RowProps {
  }
 
 export function ScheduleRow({schedule, update, remove}: RowProps): ReactElement {    
-    console.log(schedule);
     if(!schedule.role) throw Error("schedule.Role is undefined");
-    const scheduleRowEdit = <InputScheduleRow 
+    const scheduleRowEdit = <InputScheduleRow
         schedule={schedule} 
         onReturn={() => updateRow(State.Default)}
         onSave={update}/>;
 
-    const scheduleRowIndex = <ScheduleRowIndex schedule={schedule} role={schedule.role} remove={remove} update={() => updateRow(State.Edit)}/>;
+    const scheduleRowIndex = <ScheduleRowIndex schedule={schedule} remove={remove} update={() => updateRow(State.Edit)}/>;
         
     
     const [row, setRow] = useState<ReactElement>(scheduleRowIndex);
@@ -41,37 +40,40 @@ export function ScheduleRow({schedule, update, remove}: RowProps): ReactElement 
 
 interface ScheduleRowProps {
     schedule: Schedule;
-    role: string;
     update: (schedule: Schedule) => void;
     remove: (schedule: Schedule) => void;
 }
 
-function ScheduleRowIndex({schedule, role, remove, update}: ScheduleRowProps): ReactElement { return(<tr>
-    <th colSpan={1} scope="col" className="bg-secondary">
-        <span className="text-dark">{schedule.id}</span>
-    </th>
-    <th colSpan={1} scope="col" className="bg-secondary">
-        <input type="text" readOnly className="bg-transparent form-control shadow-none border-0" value={!schedule.name ? "" : schedule.name} />
-    </th>
-    <th colSpan={1} scope="col" className="bg-secondary">
-        <span className="text-dark">{role}</span>
-    </th>
-    <td colSpan={1} className="bg-secondary"> 
-        <div className="btn-group float-end">
-            <ActionGroup onDelete={() => remove(schedule)} schedule={schedule} onEdit={() => update(schedule)}/>
-        </div>
-    </td>
-</tr>);}
+function ScheduleRowIndex({schedule, remove, update}: ScheduleRowProps): ReactElement { 
+    return(<tr>
+        <td colSpan={1} className="fw-bold bg-secondary">
+            <span className="text-dark">{schedule.id}</span>
+        </td>
+        <td colSpan={1} className="bg-secondary">
+            <input type="text" readOnly className="bg-transparent form-control shadow-none border-0" value={!schedule.name ? "" : schedule.name} />
+        </td>
+        <td colSpan={1} className="fw-bold bg-secondary">
+            <span className="text-dark">{schedule?.role ?? ""}</span>
+        </td>
+        <td colSpan={1} className="bg-secondary">
+            <span className="text-dark">{schedule.ownerInviteCode ?? (schedule.owners ?? []).join(", ")}</span>
+        </td>
+        <td colSpan={1} className="bg-secondary"> 
+            <div className="btn-group float-end">
+                <ActionGroup onDelete={() => remove(schedule)} schedule={schedule} onEdit={() => update(schedule)}/>
+            </div>
+        </td>
+    </tr>);
+}
 
 interface InputScheduleRowProps {
     schedule?: Schedule;
-    role?: string;
     hidden? : boolean;
     onSave: (s: Schedule) => void;
     onReturn: VoidFunction;
 }
 
-export function InputScheduleRow({schedule, role, hidden, onSave, onReturn}: InputScheduleRowProps): ReactElement {
+export function InputScheduleRow({schedule, hidden, onSave, onReturn}: InputScheduleRowProps): ReactElement {
     const references = new References();
 
     function GetSchedule(): Schedule {
@@ -92,7 +94,8 @@ export function InputScheduleRow({schedule, role, hidden, onSave, onReturn}: Inp
         <td colSpan={1} className="bg-secondary">
             <input ref={references.GetInput("input")} defaultValue={schedule?.name ?? ""} type="text" className="form-control bg-secondary border-primary"/>
         </td>
-        <td colSpan={1} className="bg-secondary">{role ?? ""}</td>
+        <td colSpan={1} className="fw-bold bg-secondary">{schedule?.role ?? ""}</td>
+        <td colSpan={1} className="bg-secondary">{schedule?.ownerInviteCode ?? (schedule?.owners ?? []).join(", ")}</td>
         <td colSpan={1} className="bg-secondary"> 
             <div className="btn-group float-end bg-secondary">
                 <SaveButton onSave={() => {onSave(GetSchedule()); return {};}} onReturn={onReturn} />
