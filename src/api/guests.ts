@@ -9,20 +9,16 @@ export default class GuestsApi {
     constructor(token: string){
         this.api = new Api(token);
     }
-
-    async set(reservationId: number, guests: Guest[]) : Promise<Guest[]> {
-        return await this.api.put(process.env.REACT_APP_API_URL + "/Set/" + reservationId, guests!.map(ToJsonGuest));
-    }
-
+    
     async create(guest: Guest) : Promise<Guest> {
-        return await this.api.post(process.env.REACT_APP_API_URL + "/Create", ToJsonGuest(guest));
+        return await this.api.post(`${this.baseUrl}/Create`, ToJsonGuest(guest));
     }
 
     async update(guest: Guest) : Promise<Guest> {
-        return await this.api.post(process.env.REACT_APP_API_URL + "/Update", ToJsonGuest(guest));
+        return await this.api.post(`${this.baseUrl}/Update`, ToJsonGuest(guest));
     }
 
     async delete(guestId: number) : Promise<boolean> {
-        return await this.api.delete(process.env.REACT_APP_API_URL + "/Delete/" + guestId);
+        return await this.api.delete(`${this.baseUrl}/Delete/${guestId}`);
     }
 }

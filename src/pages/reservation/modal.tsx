@@ -5,7 +5,6 @@ import Guest from "../../models/Guest";
 import Reservation from "../../models/Reservation";
 import Room from "../../models/Room";
 import {default as ReservationPage} from "./page";
-import axios from "axios";
 import GuestModal, { CreateGuestModal } from "../guest/modal";
 
 interface CreateReservationModalProps {
@@ -37,7 +36,7 @@ export function CreateReservationModal({checkIn, room, rooms, onSave, onHide}: C
     return(<ReservationModal reservation={blankReservation} rooms={rooms} onSave={onSave} onHide={onHide}/>);
 }
 
-interface Props{
+interface Props {
     reservation: Reservation,
     rooms: Room[],
     onSave: (r: Reservation | undefined) => void,
@@ -73,7 +72,6 @@ export default function ReservationModal({reservation, onSave, onHide, rooms}: P
     }
 
     const onRemoveGuest = (guest: Guest): void => {
-        if(tempReservation.id! > -1) axios.delete(process.env.REACT_APP_API_URL + "/Guests/Delete/" + guest.id);
         setTempReservation({...tempReservation, guests: tempReservation.guests!.filter(p => p.id !== guest.id)});
         toReservationModal();
     }

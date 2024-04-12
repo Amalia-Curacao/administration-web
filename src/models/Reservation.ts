@@ -14,6 +14,7 @@ export default interface Reservation{
     bookingSource?: BookingSource;
     remarks?: string;
 
+    scheduleId?: number;
     roomNumber?: number;
     roomType?: RoomType;
     roomScheduleId?: number;

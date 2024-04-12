@@ -41,7 +41,9 @@ const AuthenticationProvider = (): ReactElement => {
   }, [cookies.accessToken, getAccessTokenSilently, setCookie]);
 
   const signOut = useCallback(async () => {
+    console.log('signOut');
     if(!cookies.accessToken) return;
+    console.log("accessToken");
     await new AccessTokenApi().revoke(cookies.accessToken);
     await logout();
     setCookie('accessToken', '', { path: '/', expires: new Date(0) });

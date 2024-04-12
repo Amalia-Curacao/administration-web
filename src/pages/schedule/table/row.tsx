@@ -1,10 +1,11 @@
-import { ReactElement, useState } from "react";
+import { Fragment, ReactElement, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SaveButton from "../../../components/saveButton";
 import Schedule from "../../../models/Schedule";
 import { pages } from "../../../routes";
 import References from "../../../tools/References";
 import { default as State } from "../../../types/PageState";
+import UserRoles from "../../../models/enums/UserRoles";
 
 interface RowProps {
     schedule: Schedule;
@@ -13,13 +14,14 @@ interface RowProps {
  }
 
 export function ScheduleRow({schedule, update, remove}: RowProps): ReactElement {    
+    console.log(schedule);
     if(!schedule.role) throw Error("schedule.Role is undefined");
     const scheduleRowEdit = <InputScheduleRow 
         schedule={schedule} 
         onReturn={() => updateRow(State.Default)}
         onSave={update}/>;
 
-    const scheduleRowIndex = <ScheduleRowIndex schedule={schedule} role={schedule.role} remove={remove} update={update}/>;
+    const scheduleRowIndex = <ScheduleRowIndex schedule={schedule} role={schedule.role} remove={remove} update={() => updateRow(State.Edit)}/>;
         
     
     const [row, setRow] = useState<ReactElement>(scheduleRowIndex);
@@ -64,11 +66,12 @@ function ScheduleRowIndex({schedule, role, remove, update}: ScheduleRowProps): R
 interface InputScheduleRowProps {
     schedule?: Schedule;
     role?: string;
+    hidden? : boolean;
     onSave: (s: Schedule) => void;
     onReturn: VoidFunction;
 }
 
-export function InputScheduleRow({schedule, role, onSave, onReturn}: InputScheduleRowProps): ReactElement {
+export function InputScheduleRow({schedule, role, hidden, onSave, onReturn}: InputScheduleRowProps): ReactElement {
     const references = new References();
 
     function GetSchedule(): Schedule {
@@ -80,7 +83,7 @@ export function InputScheduleRow({schedule, role, onSave, onReturn}: InputSchedu
         };
     }
 
-    return(<>
+    return(<tr hidden={hidden}>
         <td colSpan={1} className="bg-secondary">
             <span ref={references.GetSpan("id")} className="fw-bold bg-secondary">
                 {schedule?.id ?? "~"}
@@ -91,11 +94,11 @@ export function InputScheduleRow({schedule, role, onSave, onReturn}: InputSchedu
         </td>
         <td colSpan={1} className="bg-secondary">{role ?? ""}</td>
         <td colSpan={1} className="bg-secondary"> 
-            <div className="btn-group float-end">
+            <div className="btn-group float-end bg-secondary">
                 <SaveButton onSave={() => {onSave(GetSchedule()); return {};}} onReturn={onReturn} />
             </div>
         </td>
-    </>);
+    </tr>);
 } 
 
 interface ActionGroupProps {
@@ -106,11 +109,12 @@ interface ActionGroupProps {
 
 function ActionGroup({schedule, onDelete, onEdit}: ActionGroupProps): ReactElement {
     const navigate = useNavigate(); 
+    const deleteButtonText = schedule.role === UserRoles.Admin ? "Delete" : "Leave"; 
 
     return(
         <div className="btn-group">
-            <button onClick={() => navigate(pages["room index"].route + "/" + schedule.id, {replace: true})} className="btn btn-outline-primary">Details</button>
-            <button onClick={onEdit} className="btn btn-outline-warning">Edit</button>
-            <button onClick={onDelete} className="btn btn-outline-danger">Delete</button>
+            <button onClick={() => navigate(pages["role router"].route + "/" + schedule.id)} className="btn btn-outline-primary">Details</button>
+            { schedule.role === UserRoles.Owner || schedule.role === UserRoles.Admin ? <button onClick={onEdit} className="btn btn-outline-warning">Edit</button> : <Fragment/> }
+            <button onClick={onDelete} className="btn btn-outline-danger">{deleteButtonText}</button>
         </div>);
 }

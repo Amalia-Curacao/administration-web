@@ -1,4 +1,4 @@
-import { Fragment, ReactElement, useEffect, useState } from "react";
+import { Fragment, ReactElement, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { pages } from "../../../routes";
 import { MdBedroomParent } from "react-icons/md";
@@ -12,29 +12,30 @@ import Reservation from "../../../models/Reservation";
 import { MapAll as MapRooms } from "../../../mapping/room";
 import ReservationsApi from "../../../api/reservations";
 import RoomsApi from "../../../api/rooms";
-import { useAuth0 } from "@auth0/auth0-react";
 import GuestsApi from "../../../api/guests";
+import useAuthentication from "../../../authentication/useAuthentication";
 
 function Index(): ReactElement {
     const { id } = useParams();
     if(!id) throw new Error("Schedule ID is undefined.");
-    const { getAccessTokenSilently } = useAuth0();
+    const scheduleId = parseInt(id);
+    const { getAccessToken } = useAuthentication();
     const [rooms, setRooms] = useState<Room[]>([]);
     const [modal, setModal] = useState<ReactElement>(<Fragment/>);
-    const [roomApi, setRoomApi] = useState<RoomsApi>();
-    const [reservationApi, setReservationsApi] = useState<ReservationsApi>();  
-    const [guestApi, setGuestsApi] = useState<GuestsApi>();
+    const roomApi = useRef<RoomsApi>();
+    const reservationApi = useRef<ReservationsApi>();
+    const guestApi = useRef<GuestsApi>();
 
     useEffect(() => {
-        getAccessTokenSilently()
+        getAccessToken()
             .then(token => {
-                setRoomApi(new RoomsApi(token));
-                setReservationsApi(new ReservationsApi(token));
-                setGuestsApi(new GuestsApi(token));
+                roomApi.current = new RoomsApi(token);
+                reservationApi.current = new ReservationsApi(token);
+                guestApi.current = new GuestsApi(token);
             })
-            .then(() => roomApi!.get(parseInt(id))
-                .then(rooms => setRooms(MapRooms(rooms))));
-    }, [getAccessTokenSilently, id, roomApi, setRoomApi, setRooms, setReservationsApi, setGuestsApi]);
+            .then(() => {roomApi.current!.get(scheduleId)
+                .then(rooms => setRooms(MapRooms(rooms)))});
+    }, [getAccessToken, scheduleId, roomApi, setRooms]);
 
     const navigate = useNavigate();
     const [monthYear, setMonthYear] = useState(new Date());
@@ -43,7 +44,7 @@ function Index(): ReactElement {
         {modal}
         <div style={{borderRadius:"5px" }} className="p-3 m-3 mb-2 bg-primary d-flex flex-fill flex-row">
             <MonthYearSelector monthYear={monthYear} onChange={onMonthYearSelected}/>
-            <button onClick={() => navigate(pages["housekeeper index"].route + "/" + id)} className="btn btn-secondary btn-outline-primary float-end">Housekeeping</button>
+            <button onClick={() => navigate(pages["housekeeper index"].route + "/" + scheduleId)} className="btn btn-secondary btn-outline-primary float-end">Housekeeping</button>
         </div>
         <div className="p-3 pb-0 d-flex flex-column flex-fill">
             <Rooms monthYear={monthYear} rooms={rooms} displayGuestNames={true} displayHousekeepingTasks={false} OnCellClick={onCellClick}/>
@@ -67,30 +68,37 @@ function Index(): ReactElement {
             setModal(<Fragment/>);
         }
 
-        function onSaveExisting(newR: Reservation | undefined, oldR: Reservation): void{
-            newR ? onUpdate(newR) : onDelete(oldR)
+        function onSaveExisting(reservation: Reservation | undefined, oldReservation: Reservation): void{
+            reservation ? onUpdate(reservation) : onDelete(oldReservation)
 
             function onUpdate(reservation: Reservation): void {
-                if(!reservationApi || !guestApi) return;
-                reservationApi.update(reservation)
-                    .then(() => guestApi.set(reservation.id!, reservation.guests!))
-                    .then(() => navigate(0));
+                if (!reservationApi.current || !guestApi.current) return;
+                reservationApi.current.update(reservation)
+                    .then(() => {
+                        const toUpdate = reservation.guests!.filter(g => oldReservation.guests!.findIndex(g2 => g2.id === g.id) > -1);
+                        const toDelete = oldReservation.guests!.filter(g => reservation.guests!.findIndex(g2 => g2.id === g.id && g.id! > -1) === -1);
+                        const toCreate = reservation.guests!.filter(g => g.id! <= -1);
+                        Promise.all([
+                            toUpdate.forEach(g => guestApi.current!.update(g)),
+                            toDelete.forEach(g => guestApi.current!.delete(g.id!)),
+                            toCreate.forEach(g => guestApi.current!.create({...g, reservationId: reservation.id}))
+                        ]).then(() => navigate(0));
+                    });
             }
 
             function onDelete(reservation: Reservation): void {
-                if(!reservationApi) return;
-                reservationApi.delete(reservation.id!)
-                    .then(() => navigate(0));
+                if (!reservationApi.current) return;
+                reservationApi.current.delete(reservation.id!).then(() => navigate(0));
             }
         }
 
-        function onSaveNew(newR: Reservation | undefined): void {
-            if(!reservationApi || !guestApi) return;
-            newR 
-                ? reservationApi.create(newR)
-                    .then((r) => newR.guests!.forEach((g) => guestApi.create({...g, reservationId: r.id}))) 
+        function onSaveNew(reservation: Reservation | undefined): void {
+            if (!reservationApi.current || !guestApi.current) return;
+            else if (reservation) {
+                reservationApi.current!.create(reservation)
+                    .then((r) => reservation!.guests!.forEach((g) => guestApi.current!.create({...g, reservationId: r.id}))) 
                     .then(() => navigate(0))
-                : console.log("");
+            }
         }
     }
 }

@@ -1,5 +1,4 @@
-import { Fragment, ReactElement, useEffect, useRef, useState } from "react";
-import accessToken from "../../../api/accessToken";
+import { ReactElement, useEffect, useRef, useState } from "react";
 import ScheduleInviteLinkApi from "../../../api/scheduleInviteLink";
 import useAuthentication from "../../../authentication/useAuthentication";
 
@@ -11,7 +10,7 @@ interface TableHeaderProps {
 
 export default function TableHeader({setCreating, isCreating, isAdmin}: TableHeaderProps): ReactElement {
 
-    const extraHeader = !isAdmin 
+    const extraHeader = isAdmin 
         ? <button hidden={isCreating} onClick={() => setCreating(true)} className="btn btn-outline-success float-end"> Add </button>
         : <InviteHeader/>;
 

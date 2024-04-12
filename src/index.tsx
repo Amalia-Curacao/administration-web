@@ -2,23 +2,16 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import reportWebVitals from './reportWebVitals';
 import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from 'react-router-dom';
-import Layout from './layout';
 import Routes from './routes';
 import { CookiesProvider } from 'react-cookie';
 import AuthenticationProvider from './authentication/authenticationProvider';
 
-const router = createBrowserRouter( createRoutesFromElements(
-      <Route element={<AuthenticationProvider/>}>
-      {Routes()}
-    </Route>)
-);
+const router = createBrowserRouter(createRoutesFromElements(<Route element={<AuthenticationProvider/>}>{Routes()}</Route>));
 
 createRoot(document.getElementById('root') as HTMLElement).render(
     <StrictMode>
       <CookiesProvider>
-        <Layout>
-          <RouterProvider router={router}/>
-        </Layout>
+        <RouterProvider router={router}/>
       </CookiesProvider>
     </StrictMode>
 );

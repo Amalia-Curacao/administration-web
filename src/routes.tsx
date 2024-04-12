@@ -7,6 +7,8 @@ import Logo from "./svgs/logo";
 import colors from "./scss/colors.module.scss";
 import { ReactElement } from "react";
 import { Route } from "react-router-dom";
+import { page as RoleRouter } from "./pages/schedule/roleRouter";
+import Layout from "./layout";
 
 export const defaultPage: PageLink = {
     route: "/",
@@ -17,6 +19,7 @@ export const defaultPage: PageLink = {
 
 export const pages: { [id: string]: PageLink; } = {
     "default": defaultPage,
+    "role router": RoleRouter,
     "schedule index": SchedulesPage,
     "room index": RoomsPage,
     "housekeeper index": HousekeepersPage,
@@ -25,6 +28,6 @@ export const pages: { [id: string]: PageLink; } = {
 
 export default function Routes(): ReactElement {
     return(<>
-        {Object.values(pages).map((page, i) => <Route key={i} path={page.route + (page.params ?? "")} element={page.element}/>)}
+        {Object.values(pages).map((page, i) => <Route key={i} path={page.route + (page.params ?? "")} element={<Layout>{page.element}</Layout>}/>)}
     </>);
 }

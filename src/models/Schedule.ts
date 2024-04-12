@@ -1,5 +1,5 @@
 import Room from "./Room";
-import ScheduleInviteLinks from "./ScheduleInviteLinks";
+import ScheduleInviteLink from "./ScheduleInviteLinks";
 import UserRoles from "./enums/UserRoles";
 
 interface Schedule{
@@ -7,7 +7,7 @@ interface Schedule{
     name?: string;
     role?: UserRoles;
     rooms?: Room[];
-    inviteLinks?: ScheduleInviteLinks[];
+    inviteLinks?: ScheduleInviteLink[];
 }
 
 export default Schedule;

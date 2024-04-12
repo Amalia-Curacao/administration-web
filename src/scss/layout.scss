@@ -1,4 +1,8 @@
 @import "./colors.module.scss";
+
+html {
+    background-color: $secondary;
+}
 a {
     color: inherit !important;
     text-decoration: none;

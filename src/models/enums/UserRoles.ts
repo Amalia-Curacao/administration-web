@@ -1,8 +1,9 @@
 enum UserRoles {
     None = "None",
     Admin = "Admin",
-    Housekeeper = "Housekeeper",
     Manager = "Manager",
+    Owner = "Owner",
+    Housekeeper = "Housekeeper",
 }
 
 export default UserRoles;

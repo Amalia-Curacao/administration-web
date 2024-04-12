@@ -14,12 +14,8 @@ export default function Table({schedules, On, isAdmin} : TableProps): ReactEleme
     return (<table className="table table-hover table-secondary">
         <TableHeader setCreating={setCreating} isCreating={isCreating} isAdmin={isAdmin}/>
         <tbody>
-            <tr hidden={!isCreating}>
-                <InputScheduleRow  onSave={(s) => On(s).create() } onReturn={() => setCreating(false)}/>
-            </tr>
-            {schedules.map(s => {
-                return <ScheduleRow key={s.id} schedule={s} update={(s) => On(s).update()} remove={(s) => On(s).remove()} />;
-            })}
+            <InputScheduleRow hidden={!isCreating} onSave={(s) => On(s).create() } onReturn={() => setCreating(false)}/>
+            {schedules.map(s => <ScheduleRow key={s.id} schedule={s} update={(s) => On(s).update()} remove={(s) => On(s).remove()}/>)}
         </tbody>        
     </table>);
 

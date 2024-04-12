@@ -1,3 +1,4 @@
+import { ToJsonReservation } from "../extensions/ToJson";
 import Reservation from "../models/Reservation";
 import Api from "./api";
 
@@ -9,10 +10,20 @@ export default class ReservationsApi {
         this.api = new Api(token);
     }
     async create(reservation: Reservation) : Promise<Reservation> {
-        return await this.api.post(`${this.baseUrl}/Create`, reservation);
+        reservation = {
+            ...reservation,
+            scheduleId: reservation.scheduleId ?? reservation.roomScheduleId,
+            roomScheduleId: reservation.roomScheduleId ?? reservation.scheduleId,
+        };
+        return await this.api.post(`${this.baseUrl}/Create`, ToJsonReservation(reservation));
     }
     async update(reservation: Reservation) : Promise<Reservation> {
-        return await this.api.post(`${this.baseUrl}/Update`, reservation);
+        reservation = {
+            ...reservation,
+            scheduleId: reservation.scheduleId ?? reservation.roomScheduleId,
+            roomScheduleId: reservation.roomScheduleId ?? reservation.scheduleId,
+        };
+        return await this.api.post(`${this.baseUrl}/Update`, ToJsonReservation(reservation));
     }
     async delete(reservationId: number) : Promise<boolean>{
         return await this.api.delete(`${this.baseUrl}/Delete/${reservationId}`);
