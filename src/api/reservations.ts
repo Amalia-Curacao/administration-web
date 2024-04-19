@@ -1,27 +1,31 @@
-import axios from "axios";
-import Reservation from "../models/Reservation";
 import { ToJsonReservation } from "../extensions/ToJson";
-import Map from "../mapping/reservation";
+import Reservation from "../models/Reservation";
+import Api from "./api";
 
-const reservationsApi = {
- /* get: (roomScheduleId: number, roomNumber: number) => 
-        axios.get(process.env.REACT_APP_API_URL + "/Reservations/Get/" + roomScheduleId + "/" + roomNumber)
-            .then(response => Map(response.data)), */
- /* get: (id: number) =>
-        axios.get(process.env.REACT_APP_API_URL + "/Reservations/Get/" + id)
-            .then(response => Map(response.data)), */
+export default class ReservationsApi {
+    baseUrl: string = `${process.env.REACT_APP_API_URL}/Reservations`;
+    api : Api;
 
-    create: (reservation: Reservation) : Promise<Reservation> =>
-        axios.post(process.env.REACT_APP_API_URL + "/Reservations/Create", ToJsonReservation(reservation))
-            .then(response => Map(response.data)),
-
-    update: (reservation: Reservation) : Promise<Reservation> =>
-        axios.post(process.env.REACT_APP_API_URL + "/Reservations/Update", ToJsonReservation(reservation))
-        .then(response => Map(response.data)),
-        
-    delete: (reservationId: number) : Promise<boolean> =>
-        axios.delete(process.env.REACT_APP_API_URL + "/Reservations/Delete" + reservationId)
-        .then(response => response.data),
+    constructor(token: string){
+        this.api = new Api(token);
+    }
+    async create(reservation: Reservation) : Promise<Reservation> {
+        reservation = {
+            ...reservation,
+            scheduleId: reservation.scheduleId ?? reservation.roomScheduleId,
+            roomScheduleId: reservation.roomScheduleId ?? reservation.scheduleId,
+        };
+        return await this.api.post(`${this.baseUrl}/Create`, ToJsonReservation(reservation));
+    }
+    async update(reservation: Reservation) : Promise<Reservation> {
+        reservation = {
+            ...reservation,
+            scheduleId: reservation.scheduleId ?? reservation.roomScheduleId,
+            roomScheduleId: reservation.roomScheduleId ?? reservation.scheduleId,
+        };
+        return await this.api.post(`${this.baseUrl}/Update`, ToJsonReservation(reservation));
+    }
+    async delete(reservationId: number) : Promise<boolean>{
+        return await this.api.delete(`${this.baseUrl}/Delete/${reservationId}`);
+    }
 }
-
-export default reservationsApi;

@@ -86,11 +86,11 @@ function Body({guest}: {guest: Guest}): ReactElement{
     </>);
 }
 
-export default function Page(guest: Guest): {action: () => Guest | undefined, body: ReactElement}{
+export default function Page(guest: Guest): {action: () => Guest | undefined, body: ReactElement} {
     if(!guest.reservationId) throw new Error("Guest does not have a reservation");
 
     return({
         action: () => Action(guest.reservationId!, guest.id!),
-        body: <Body guest={guest}/>
+        body: Body({guest}),
     });
 }

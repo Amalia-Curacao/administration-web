@@ -43,7 +43,6 @@ export function toDateTimeString(date: Date): string {
 
 export function HourMinuteToDateTime(s: string | undefined): Date | undefined {
     if(s === undefined || s.length === 0) return;
-    console.log(new Date("0000-01-01T" + s + ":00.000"));
     return new Date("0000-01-01T" + s + ":00.000");
 }
 

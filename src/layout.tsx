@@ -1,13 +1,11 @@
 import { ReactElement } from "react";
 import './scss/layout.scss';
+import Navbar from "./components/navbar";
 
 export default function Layout({children}: {children: ReactElement}): ReactElement{
-    return (
-    <div className="d-flex flex-fill">
-        { /* <Sidebar links={Object.values(routes)}/> */ }
-        <main className="bg-secondary w-100 vh-100">
-            {children}
-        </main>
-    </div>
-    );
+    
+    return (<main className="bg-secondary w-100">
+        <Navbar/>
+        {children}
+    </main>);
 }

@@ -1,20 +1,22 @@
-import axios from "axios";
-import HousekeepingTask from "../models/HousekeepingTask";
 import { ToJsonHousekeepingTask } from "../extensions/ToJson";
 import Map from "../mapping/housekeepingTask";
+import HousekeepingTask from "../models/HousekeepingTask";
+import Api from "./api";
 
-export const housekeepingTasksApi = {
-    create: (housekeepingTask: HousekeepingTask): Promise<HousekeepingTask> =>
-        axios.post(process.env.REACT_APP_API_URL + "/HousekeepingTasks/Create", ToJsonHousekeepingTask(housekeepingTask))
-            .then(response => Map(response.data)),
-    
-    update: (housekeepingTask: HousekeepingTask): Promise<HousekeepingTask> =>
-        axios.post(process.env.REACT_APP_API_URL + "/HousekeepingTasks/Update", ToJsonHousekeepingTask(housekeepingTask))
-            .then(response => Map(response.data)),
+export default class HousekeepingTasksApi {
+    baseUrl: string = `${process.env.REACT_APP_API_URL}/HousekeepingTasks`;
+    api : Api;
 
-    delete: (housekeepingTask: HousekeepingTask): Promise<boolean> =>
-        axios.post(process.env.REACT_APP_API_URL + "/HousekeepingTasks/Delete", ToJsonHousekeepingTask(housekeepingTask))
-            .then(response => response.data),
+    constructor(token: string){
+        this.api = new Api(token);
+    }
+    async create(housekeepingTask: HousekeepingTask) : Promise<HousekeepingTask> {
+        return Map(await this.api.post(`${this.baseUrl}/Create`, ToJsonHousekeepingTask(housekeepingTask)));
+    }
+    async update(housekeepingTask: HousekeepingTask) : Promise<HousekeepingTask> {
+        return Map(await this.api.post(`${this.baseUrl}/Update`, ToJsonHousekeepingTask(housekeepingTask)));
+    }
+    async delete(housekeepingTask: HousekeepingTask) : Promise<boolean>{
+        return await this.api.post(`${this.baseUrl}/Delete/`, ToJsonHousekeepingTask(housekeepingTask));
+    }
 }
-
-export default housekeepingTasksApi;

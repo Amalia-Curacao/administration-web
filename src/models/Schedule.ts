@@ -1,15 +1,15 @@
-import Housekeeper from "./Housekeeper";
-import HousekeepingTask from "./HousekeepingTask";
-import Reservation from "./Reservation";
 import Room from "./Room";
+import ScheduleInviteLink from "./ScheduleInviteLinks";
+import UserRoles from "./enums/UserRoles";
 
 interface Schedule{
-    id: number | undefined;
-    name: string | undefined;
-    rooms: Room[] | undefined;
-    reservations: Reservation[] | undefined;
-    housekeepers: Housekeeper[] | undefined;
-    housekeepingTasks: HousekeepingTask[] | undefined;
+    id?: number;
+    name?: string;
+    role?: UserRoles;
+    owners?: string[];
+    rooms?: Room[];
+    inviteLinks?: ScheduleInviteLink[];
+    ownerInviteCode?: string;
 }
 
 export default Schedule;

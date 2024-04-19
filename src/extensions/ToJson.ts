@@ -23,39 +23,26 @@ import RoomType from "../models/enums/RoomType";
 
 export function ToJsonReservation(reservation: Reservation): any{
     return {
-        id: reservation.id,
-        guests: undefined,
-        checkIn: !reservation.checkIn ? undefined : ToJsonDateOnly(reservation.checkIn), 
-        checkOut: !reservation.checkOut ? undefined : ToJsonDateOnly(reservation.checkOut),
-        room: undefined,
-        roomNumber: reservation.roomNumber,
-        roomScheduleId: reservation.roomScheduleId,
+        ...reservation,
         roomType: ToJsonRoomType(reservation.roomType!), 
         bookingSource: ToJsonBookingSource(reservation.bookingSource!),
-        flightArrivalNumber: reservation.flightArrivalNumber,
+        checkIn: !reservation.checkIn ? undefined : ToJsonDateOnly(reservation.checkIn), 
+        checkOut: !reservation.checkOut ? undefined : ToJsonDateOnly(reservation.checkOut),
         flightArrivalTime: !reservation.flightArrivalTime ? undefined : ToJsonTimeOnly(reservation.flightArrivalTime),
-        flightDepartureNumber: reservation.flightDepartureNumber,
         flightDepartureTime: !reservation.flightDepartureTime ? undefined : ToJsonTimeOnly(reservation.flightDepartureTime),
-        schedule: undefined,
-        scheduleId: reservation.scheduleId,
-        remarks: reservation.remarks,
+        room: undefined,
+        guests: undefined,
     };
 }
 
 export function ToJsonHousekeepingTask(task: HousekeepingTask): any {
     return {
+        ...task,
         date: !task.date ? undefined : ToJsonDateOnly(task.date),
         type: !task.type ? undefined : ToJsonHousekeepingTaskType(task.type),
-
         room: undefined,
-        roomNumber: task.roomNumber,
-        roomScheduleId: task.roomScheduleId,
-
         schedule: undefined,
-        scheduleId: task.scheduleId,
-        
         housekeeper: undefined,
-        housekeeperId: task.housekeeperId,
     };
 }
 
@@ -120,14 +107,8 @@ export function ToJsonHousekeepingTaskType(type: HousekeepingTaskType): number{
 
 export function ToJsonGuest(guest: Guest): any {
     return{
-        id: guest.id,
+        ...guest,
         prefix: ToJsonPrefix(guest.prefix ?? PersonPrefix.Unknown),
-        firstName: guest.firstName,
-        lastName: guest.lastName,
-        age: guest.age,
-        note: guest.note,
-
-        reservationId: guest.reservationId,
         reservation: undefined,
     }
 }

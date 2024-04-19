@@ -1,18 +1,19 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import reportWebVitals from './reportWebVitals';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import Layout from './layout';
-import RouteObjects from './routes';
+import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from 'react-router-dom';
+import Routes from './routes';
+import { CookiesProvider } from 'react-cookie';
+import AuthenticationProvider from './authentication/authenticationProvider';
 
-
+const router = createBrowserRouter(createRoutesFromElements(<Route element={<AuthenticationProvider/>}>{Routes()}</Route>));
 
 createRoot(document.getElementById('root') as HTMLElement).render(
-  <StrictMode>
-    <Layout>
-      <RouterProvider router={createBrowserRouter(RouteObjects())} />
-    </Layout>
-  </StrictMode>
+    <StrictMode>
+      <CookiesProvider>
+        <RouterProvider router={router}/>
+      </CookiesProvider>
+    </StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

@@ -1,11 +1,11 @@
 import { ReactElement } from "react";
-import Housekeeper from "../../models/Housekeeper";
+import User from "../../models/User";
 import References from "../../tools/References";
 import InputField from "../../components/inputField";
 
 const references = new References();
 
-function Body({housekeeper}: {housekeeper: Housekeeper}): ReactElement {
+function Body({housekeeper}: {housekeeper: User}): ReactElement {
     return(<table className="w-100">
         <tbody>
             <tr>
@@ -48,20 +48,20 @@ function Body({housekeeper}: {housekeeper: Housekeeper}): ReactElement {
 
 }
 
-function Action(housekeeper: Housekeeper): Housekeeper | undefined {
-    const newHousekeeper: Housekeeper = {
+function Action(housekeeper: User): User | undefined {
+    const newHousekeeper: User = {
         id: housekeeper.id,
+        auth0: housekeeper.auth0,
         firstName: references.GetInput("first-name").current!.value,
         lastName: references.GetInput("last-name").current!.value,
         note: references.GetTextArea("note").current!.value,
-        scheduleId: housekeeper.scheduleId,
-        schedule: undefined,
+        invites: undefined,
         tasks: undefined,
     };
     return (Validate(newHousekeeper) ? newHousekeeper : undefined);
 }
 
-function Validate(housekeeper: Housekeeper): boolean {
+function Validate(housekeeper: User): boolean {
     let isValid = true;
 
     if(housekeeper.firstName !== undefined || housekeeper.firstName === "") {
@@ -73,8 +73,7 @@ function Validate(housekeeper: Housekeeper): boolean {
     return isValid;
 }
 
-export default function Page(housekeeper: Housekeeper): {body: ReactElement, action: () => Housekeeper | undefined} {
+export default function Page(housekeeper: User): {body: ReactElement, action: () => User | undefined} {
     if(!housekeeper.id) throw new Error("Housekeeper must have an id");
-    if(!housekeeper.scheduleId) throw new Error("Housekeeper must have a scheduleId");
     return({body: <Body housekeeper={housekeeper}/>, action: () => Action(housekeeper)});
 }

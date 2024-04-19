@@ -1,24 +1,27 @@
-import axios from "axios";
-import Housekeeper from "../models/Housekeeper";
+import Map from "../mapping/string";
+import Room from "../models/Room";
+import User from "../models/User";
+import Api from "./api";
 
-export const housekeepersApi = {
-    getAll: (scheduleId: number): Promise<Housekeeper[]> => 
-        axios.get(process.env.REACT_APP_API_URL + "/Housekeepers/GetAll/" + scheduleId)
-            .then(response => response.data),
+export default class HousekeepersApi {
+    baseUrl: string = `${process.env.REACT_APP_API_URL}/Housekeepers`;
+    api : Api;
 
-    get: (housekeeperId: number): Promise<Housekeeper> =>
-        axios.get(process.env.REACT_APP_API_URL + "/Housekeepers/Get/" + housekeeperId)
-            .then(response => response.data),
+    constructor(token: string){
+        this.api = new Api(token);
+    }
 
-    create: (housekeeper: Housekeeper): Promise<Housekeeper> =>
-        axios.post(process.env.REACT_APP_API_URL + "/Housekeepers/Create", housekeeper)
-            .then(response => response.data),
+    async get(scheduleId: number): Promise<User[]> { 
+        return await this.api.get(`${this.baseUrl}/Get/${scheduleId}`);
+    }
 
-    update: (housekeeper: Housekeeper): Promise<Housekeeper> =>
-        axios.post(process.env.REACT_APP_API_URL + "/Housekeepers/Update", housekeeper)
-            .then(response => response.data),
-    
-    delete: (housekeeperId: number): Promise<boolean> =>
-        axios.delete(process.env.REACT_APP_API_URL + "/Housekeepers/Delete/" + housekeeperId)
-            .then(response => response.data),
+    async note(userId: number, note: string, scheduleId: number): Promise<User>{
+        return await this.api.get(`${this.baseUrl}/Note/${scheduleId}/${userId}/${Map(note)}`);
+    }
+
+    async rooms(scheduleId: number, userId?: number): Promise<Room[]>{
+        return userId !== undefined
+            ? await this.api.get(`${this.baseUrl}/Rooms/${scheduleId}/${userId}`) 
+            : await this.api.get(`${this.baseUrl}/Rooms/${scheduleId}`);
+    }
 }

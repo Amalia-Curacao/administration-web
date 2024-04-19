@@ -1,4 +1,4 @@
-import { Fragment, ReactElement, useEffect, useState } from "react";
+import { Fragment, ReactElement, useEffect, useRef, useState } from "react";
 import PageLink from "../../../types/PageLink";
 import { GiMagicBroom } from "react-icons/gi";
 import { useNavigate, useParams } from "react-router-dom";
@@ -9,28 +9,39 @@ import { isSameDay } from "../../../extensions/Date";
 import HousekeepingTask from "../../../models/HousekeepingTask";
 import { FaLongArrowAltLeft, FaLongArrowAltRight } from "react-icons/fa";
 import HousekeepingTaskModal, { CreateHousekeepingTaskModal } from "../../housekeepingtask/modal";
-import roomsApi from "../../../api/rooms";
-import housekeepingTasksApi from "../../../api/housekeepingTasks";
+import HousekeepingTasksApi from "../../../api/housekeepingTasks";
+import useAuthentication from "../../../authentication/useAuthentication";
+import HousekeepersApi from "../../../api/housekeepers";
 
 export default function Index(): ReactElement {
     const { scheduleId, id } = useParams();
     if(!scheduleId ) throw new Error("Schedule is undefined.");
     
     const navigate = useNavigate();
+    const { getAccessToken } = useAuthentication();
     const [rooms, setRooms] = useState<Room[]>([]);
     const [modal, setModal] = useState<ReactElement>(<Fragment/>);
     const [monthYear, setMonthYear] = useState(new Date());
+    const housekeepersApi = useRef<HousekeepersApi>();
+    const housekeepingTaskApi = useRef<HousekeepingTasksApi>();
 
     useEffect(() => {
-        roomsApi.get(parseInt(scheduleId))
-            .then(rooms => {
-                // filters out tasks that are not assigned to the housekeeper
-                if(id) rooms.forEach(room => room.housekeepingTasks = room.housekeepingTasks?.filter(task => task.housekeeperId! === parseInt(id)));   
-                setRooms(MapRooms(rooms));
+        getAccessToken()
+            .then(token => {
+                housekeepersApi.current = new HousekeepersApi(token);
+                housekeepingTaskApi.current = new HousekeepingTasksApi(token);
             })
-            .catch(error => console.log(error));
+            .then(() => {
+                if(!housekeepersApi.current) return;
+                housekeepersApi.current.rooms(parseInt(scheduleId))
+                    .then(rooms => {
+                        if(id) rooms.forEach(room => room.housekeepingTasks = room.housekeepingTasks?.filter(task => task.housekeeperId! === parseInt(id)));   
+                        setRooms(MapRooms(rooms));
+                    })
+                    .catch(error => console.log(error));
+            });
 
-    }, [scheduleId, id, setRooms]);
+    }, [scheduleId, id, setRooms, getAccessToken, navigate]);
 
     return(<>
         <div style={{borderRadius:"5px" }} className="p-3 m-3 mb-2 bg-primary d-flex flex-fill flex-row">
@@ -61,18 +72,20 @@ export default function Index(): ReactElement {
                 onHide();
             }
             else{
-                housekeepingTasksApi.create(task)
+                if(!housekeepingTaskApi.current) return;
+                housekeepingTaskApi.current.create(task)
                     .then(() => navigate(0));
             }
         }
 
         function onSaveExisting(task: HousekeepingTask | undefined, oldTask: HousekeepingTask): void {
+            if(!housekeepingTaskApi.current) return;
             if(!task){
-                housekeepingTasksApi.delete(oldTask)
+                housekeepingTaskApi.current.delete(oldTask)
                     .then(() => navigate(0));
             }
             else{
-                housekeepingTasksApi.update(task)
+                housekeepingTaskApi.current.update(task)
                     .then(() => navigate(0));
             }
         }

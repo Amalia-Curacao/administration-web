@@ -1,22 +1,28 @@
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useEffect, useRef, useState } from "react";
 import InputField from "../../components/inputField";
 import HousekeepingTask from "../../models/HousekeepingTask";
 import References from "../../tools/References";
 import HousekeepingTaskType from "../../models/enums/HousekeepingTaskType";
-import axios from "axios";
-import Housekeeper from "../../models/Housekeeper";
+import User from "../../models/User";
+import HousekeepersApi from "../../api/housekeepers";
+import useAuthentication from "../../authentication/useAuthentication";
 
 const references = new References();
 
 function Body({task}: {task: HousekeepingTask}): ReactElement {
-    const [housekeepers, setHousekeepers] = useState<Housekeeper[]>([]);
+    const { getAccessToken } = useAuthentication();
+    const [housekeepers, setHousekeepers] = useState<User[]>([]);
+    const housekeepersApi = useRef<HousekeepersApi>();
     useEffect(() => {
-        axios.get(process.env.REACT_APP_API_URL + "/Housekeepers/GetAll/" + task.scheduleId)
-        .then(async response => {
-            setHousekeepers(response.data as Housekeeper[]);
-        })
-        .catch(error => console.log(error));
-    }, [task.scheduleId, setHousekeepers]);
+        getAccessToken()
+            .then(token => { housekeepersApi.current = new HousekeepersApi(token); })
+            .then(() => {
+                if(!housekeepersApi.current) return;
+                housekeepersApi.current.get(task.roomScheduleId!)
+                    .then(setHousekeepers)
+                    .catch(error => console.log(error));
+            });
+    }, [task.roomScheduleId, setHousekeepers, getAccessToken]);
     
     return(<table className="w-100">
         <tbody>
@@ -66,9 +72,6 @@ function Action(task: HousekeepingTask): HousekeepingTask | undefined {
         housekeeperId: parseInt(references.GetSelect("housekeeper")!.current?.value!),
         housekeeper: task.housekeeper,
         
-        scheduleId: task.scheduleId,
-        schedule: task.schedule,
-        
         roomNumber: task.roomNumber,
         roomScheduleId: task.roomScheduleId,
         room: task.room,
@@ -94,7 +97,6 @@ function Validate(task: HousekeepingTask): boolean {
 }
 
 export default function Page(task: HousekeepingTask): { body: ReactElement, action: () => HousekeepingTask | undefined } {
-    if(!task.scheduleId) throw new Error("Schedule ID is undefined.");
     if(!task.date) throw new Error("Date is undefined.");
     if(!task.roomNumber) throw new Error("Room number is undefined.");
     if(!task.roomScheduleId) throw new Error("Room schedule ID is undefined.");

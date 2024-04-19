@@ -20,7 +20,7 @@ export default function Cells({room, monthYear, displayGuestNames, displayHousek
     for(let day = 1; day <= amount; day++) {
         const current: Date = new Date(monthYear.getFullYear(), monthYear.getMonth(), day);
 
-        days.push(<Cell room={room} current={current} displayGuestNames={displayGuestNames} displayHousekeepingTasks={displayHousekeepingTasks} OnClick={OnCellClick}/>);
+        days.push(<Cell key={day} room={room} current={current} displayGuestNames={displayGuestNames} displayHousekeepingTasks={displayHousekeepingTasks} OnClick={OnCellClick}/>);
     }
 
     return(<tr className="d-flex flex-fill bg-secondary p-0">

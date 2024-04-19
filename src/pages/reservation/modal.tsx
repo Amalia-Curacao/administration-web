@@ -1,11 +1,10 @@
-import { ReactElement, useState } from "react";
+import { Fragment, ReactElement, useState } from "react";
 import { Modal } from "react-bootstrap";
 import BookingSource from "../../models/enums/BookingSource";
 import Guest from "../../models/Guest";
 import Reservation from "../../models/Reservation";
 import Room from "../../models/Room";
 import {default as ReservationPage} from "./page";
-import axios from "axios";
 import GuestModal, { CreateGuestModal } from "../guest/modal";
 
 interface CreateReservationModalProps {
@@ -31,15 +30,13 @@ export function CreateReservationModal({checkIn, room, rooms, onSave, onHide}: C
         roomType: room.type,
         roomScheduleId: room.scheduleId,
         room: room,
-        scheduleId: room.scheduleId,
-        schedule: room.schedule,
         guests: []
     };
 
     return(<ReservationModal reservation={blankReservation} rooms={rooms} onSave={onSave} onHide={onHide}/>);
 }
 
-interface Props{
+interface Props {
     reservation: Reservation,
     rooms: Room[],
     onSave: (r: Reservation | undefined) => void,
@@ -75,7 +72,6 @@ export default function ReservationModal({reservation, onSave, onHide, rooms}: P
     }
 
     const onRemoveGuest = (guest: Guest): void => {
-        if(tempReservation.id! > -1) axios.delete(process.env.REACT_APP_API_URL + "/Guests/Delete/" + guest.id);
         setTempReservation({...tempReservation, guests: tempReservation.guests!.filter(p => p.id !== guest.id)});
         toReservationModal();
     }
@@ -101,7 +97,7 @@ export default function ReservationModal({reservation, onSave, onHide, rooms}: P
                         {tempReservation.guests!.length < 2 
                             ? (<button className="btn btn-secondary hover-success float-start" 
                                 onClick={() => toGuestModal(tempReservation.guests!.length)}>Add guest</button>) 
-                            : (<></>)}
+                            : (<Fragment/>)}
                     </div>
                     <div className="float-end btn-group">
                         {tempReservation.id! < 0 
