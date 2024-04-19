@@ -1,3 +1,5 @@
+import { ToJsonHousekeepingTask } from "../extensions/ToJson";
+import Map from "../mapping/housekeepingTask";
 import HousekeepingTask from "../models/HousekeepingTask";
 import Api from "./api";
 
@@ -9,12 +11,12 @@ export default class HousekeepingTasksApi {
         this.api = new Api(token);
     }
     async create(housekeepingTask: HousekeepingTask) : Promise<HousekeepingTask> {
-        return await this.api.post(`${this.baseUrl}/Create`, housekeepingTask);
+        return Map(await this.api.post(`${this.baseUrl}/Create`, ToJsonHousekeepingTask(housekeepingTask)));
     }
     async update(housekeepingTask: HousekeepingTask) : Promise<HousekeepingTask> {
-        return await this.api.post(`${this.baseUrl}/Update`, housekeepingTask);
+        return Map(await this.api.post(`${this.baseUrl}/Update`, ToJsonHousekeepingTask(housekeepingTask)));
     }
     async delete(housekeepingTask: HousekeepingTask) : Promise<boolean>{
-        return await this.api.post(`${this.baseUrl}/Delete/`, housekeepingTask);
+        return await this.api.post(`${this.baseUrl}/Delete/`, ToJsonHousekeepingTask(housekeepingTask));
     }
 }

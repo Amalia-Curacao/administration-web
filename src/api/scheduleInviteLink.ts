@@ -1,4 +1,3 @@
-import User from "../models/User";
 import UserRoles from "../models/enums/UserRoles";
 import Api from "./api";
 
@@ -31,7 +30,7 @@ export default class ScheduleInviteLinkApi {
     }
 
     async revoke(scheduleId: number, userId?: number, userRoles?: UserRoles): Promise<boolean>{
-        return !userId || !userId 
+        return !userId || !userRoles 
             ? await this.api.get(`${this.baseUrl}/Revoke/${scheduleId}`)
             : await this.api.get(`${this.baseUrl}/Revoke/${scheduleId}/${userId}/${userRoles}`);
     }

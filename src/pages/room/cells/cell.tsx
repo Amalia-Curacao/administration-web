@@ -6,6 +6,7 @@ import HousekeepingTaskType from "../../../models/enums/HousekeepingTaskType";
 import { FaPlus } from "react-icons/fa6";
 import { FaRegCircle } from "react-icons/fa";
 import "../../../scss/room.table.scss";
+import HousekeepingTask from "../../../models/HousekeepingTask";
 
 interface Props {
     room: Room,
@@ -21,14 +22,12 @@ export default function Cell({room, current: date, displayGuestNames, displayHou
     const occupy: Reservation[] =  (room.reservations ?? []).filter(r => (r.checkIn! <= date) && (r.checkOut! >= date));
     const checkIn = occupy.find(r => isSameDay(r.checkIn!, date));
     const checkOut = occupy.find(r => isSameDay(r.checkOut!, date));
-    const task = (room.housekeepingTasks ?? []).find(t => isSameDay(t.date!, date))
+    const task : HousekeepingTask = (room.housekeepingTasks ?? []).find(t => isSameDay(t.date!, date))
         ?? {
                 date: date,
                 room: room, 
                 roomNumber: room.number, 
-                roomScheduleId: room.scheduleId, 
-                schedule: room.schedule, 
-                scheduleId: room.scheduleId,
+                roomScheduleId: room.scheduleId
             };
     const className = "p-0 d-flex flex-fill no-decoration align-items-center justify-content-around" + darken();
 

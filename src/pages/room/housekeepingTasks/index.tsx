@@ -1,4 +1,4 @@
-import { Fragment, ReactElement, useEffect, useState } from "react";
+import { Fragment, ReactElement, useEffect, useRef, useState } from "react";
 import PageLink from "../../../types/PageLink";
 import { GiMagicBroom } from "react-icons/gi";
 import { useNavigate, useParams } from "react-router-dom";
@@ -10,30 +10,30 @@ import HousekeepingTask from "../../../models/HousekeepingTask";
 import { FaLongArrowAltLeft, FaLongArrowAltRight } from "react-icons/fa";
 import HousekeepingTaskModal, { CreateHousekeepingTaskModal } from "../../housekeepingtask/modal";
 import HousekeepingTasksApi from "../../../api/housekeepingTasks";
-import RoomsApi from "../../../api/rooms";
-import { useAuth0 } from "@auth0/auth0-react";
+import useAuthentication from "../../../authentication/useAuthentication";
+import HousekeepersApi from "../../../api/housekeepers";
 
 export default function Index(): ReactElement {
     const { scheduleId, id } = useParams();
     if(!scheduleId ) throw new Error("Schedule is undefined.");
     
     const navigate = useNavigate();
-    const { getAccessTokenSilently } = useAuth0();
+    const { getAccessToken } = useAuthentication();
     const [rooms, setRooms] = useState<Room[]>([]);
     const [modal, setModal] = useState<ReactElement>(<Fragment/>);
     const [monthYear, setMonthYear] = useState(new Date());
-    const [roomApi, setRoomApi] = useState<RoomsApi>();
-    const [housekeepingTaskApi, setHousekeepingTaskApi] = useState<HousekeepingTasksApi>();
+    const housekeepersApi = useRef<HousekeepersApi>();
+    const housekeepingTaskApi = useRef<HousekeepingTasksApi>();
 
     useEffect(() => {
-        getAccessTokenSilently()
+        getAccessToken()
             .then(token => {
-                setRoomApi(new RoomsApi(token));
-                setHousekeepingTaskApi(new HousekeepingTasksApi(token));
+                housekeepersApi.current = new HousekeepersApi(token);
+                housekeepingTaskApi.current = new HousekeepingTasksApi(token);
             })
             .then(() => {
-                if(!roomApi) return;
-                roomApi.get(parseInt(scheduleId))
+                if(!housekeepersApi.current) return;
+                housekeepersApi.current.rooms(parseInt(scheduleId))
                     .then(rooms => {
                         if(id) rooms.forEach(room => room.housekeepingTasks = room.housekeepingTasks?.filter(task => task.housekeeperId! === parseInt(id)));   
                         setRooms(MapRooms(rooms));
@@ -41,7 +41,7 @@ export default function Index(): ReactElement {
                     .catch(error => console.log(error));
             });
 
-    }, [scheduleId, id, setRooms, getAccessTokenSilently, navigate, roomApi]);
+    }, [scheduleId, id, setRooms, getAccessToken, navigate]);
 
     return(<>
         <div style={{borderRadius:"5px" }} className="p-3 m-3 mb-2 bg-primary d-flex flex-fill flex-row">
@@ -72,20 +72,20 @@ export default function Index(): ReactElement {
                 onHide();
             }
             else{
-                if(!housekeepingTaskApi) return;
-                housekeepingTaskApi.create(task)
+                if(!housekeepingTaskApi.current) return;
+                housekeepingTaskApi.current.create(task)
                     .then(() => navigate(0));
             }
         }
 
         function onSaveExisting(task: HousekeepingTask | undefined, oldTask: HousekeepingTask): void {
-            if(!housekeepingTaskApi) return;
+            if(!housekeepingTaskApi.current) return;
             if(!task){
-                housekeepingTaskApi.delete(oldTask)
+                housekeepingTaskApi.current.delete(oldTask)
                     .then(() => navigate(0));
             }
             else{
-                housekeepingTaskApi.update(task)
+                housekeepingTaskApi.current.update(task)
                     .then(() => navigate(0));
             }
         }

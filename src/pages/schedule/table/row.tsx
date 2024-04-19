@@ -6,6 +6,7 @@ import { pages } from "../../../routes";
 import References from "../../../tools/References";
 import { default as State } from "../../../types/PageState";
 import UserRoles from "../../../models/enums/UserRoles";
+import InviteLinkField from "../../../components/inviteLinkField";
 
 interface RowProps {
     schedule: Schedule;
@@ -56,8 +57,14 @@ function ScheduleRowIndex({schedule, remove, update}: ScheduleRowProps): ReactEl
             <span className="text-dark">{schedule?.role ?? ""}</span>
         </td>
         <td colSpan={1} className="bg-secondary">
-            <span className="text-dark">{schedule.ownerInviteCode ?? (schedule.owners ?? []).join(", ")}</span>
+            <span className="text-dark">{(schedule.owners ?? []).join(", ")}</span>
         </td>
+        {
+            schedule.ownerInviteCode 
+                ? <td colSpan={1} className="bg-secondary"><InviteLinkField inviteLink={schedule.ownerInviteCode}/></td> 
+                : <Fragment/>
+                
+        }
         <td colSpan={1} className="bg-secondary"> 
             <div className="btn-group float-end">
                 <ActionGroup onDelete={() => remove(schedule)} schedule={schedule} onEdit={() => update(schedule)}/>
@@ -95,7 +102,12 @@ export function InputScheduleRow({schedule, hidden, onSave, onReturn}: InputSche
             <input ref={references.GetInput("input")} defaultValue={schedule?.name ?? ""} type="text" className="form-control bg-secondary border-primary"/>
         </td>
         <td colSpan={1} className="fw-bold bg-secondary">{schedule?.role ?? ""}</td>
-        <td colSpan={1} className="bg-secondary">{schedule?.ownerInviteCode ?? (schedule?.owners ?? []).join(", ")}</td>
+        <td colSpan={1} className="bg-secondary">{(schedule?.owners ?? []).join(", ")}</td>
+        {
+            schedule?.role === UserRoles.Admin 
+                ? <td colSpan={1} className="bg-secondary"><InviteLinkField inviteLink={schedule?.ownerInviteCode ?? ""}/></td> 
+                : <Fragment/>
+        }
         <td colSpan={1} className="bg-secondary"> 
             <div className="btn-group float-end bg-secondary">
                 <SaveButton onSave={() => {onSave(GetSchedule()); return {};}} onReturn={onReturn} />

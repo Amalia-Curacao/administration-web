@@ -1,4 +1,4 @@
-import { ReactElement, useEffect, useRef, useState } from "react";
+import { Fragment, ReactElement, useEffect, useRef, useState } from "react";
 import ScheduleInviteLinkApi from "../../../api/scheduleInviteLink";
 import useAuthentication from "../../../authentication/useAuthentication";
 
@@ -31,11 +31,17 @@ export default function TableHeader({setCreating, isCreating, isAdmin}: TableHea
                     Role
                 </span>
             </th>
+            
             <th className="table-bordered bg-secondary">
                 <span className="text-dark">
                     Owner(s)
                 </span>
             </th>
+            {
+                isAdmin 
+                ? <th className="table-bordered bg-secondary"> <span className="text-dark"> Owner invite code </span> </th>   
+                : <Fragment/>
+            }
             <th className="bg-secondary">
                 {extraHeader}
             </th>

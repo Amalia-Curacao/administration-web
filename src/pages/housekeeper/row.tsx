@@ -76,7 +76,6 @@ interface DisplayRowProps {
 }
 
 function DisplayRow({housekeeper, onEdit, onDelete, onDetails}: DisplayRowProps): ReactElement {
-    console.log(housekeeper);
     return (<>
         <td className="bg-primary">
             <span className="text-secondary">{housekeeper.firstName}</span>

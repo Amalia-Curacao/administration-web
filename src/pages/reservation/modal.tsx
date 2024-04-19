@@ -1,4 +1,4 @@
-import { ReactElement, useState } from "react";
+import { Fragment, ReactElement, useState } from "react";
 import { Modal } from "react-bootstrap";
 import BookingSource from "../../models/enums/BookingSource";
 import Guest from "../../models/Guest";
@@ -97,7 +97,7 @@ export default function ReservationModal({reservation, onSave, onHide, rooms}: P
                         {tempReservation.guests!.length < 2 
                             ? (<button className="btn btn-secondary hover-success float-start" 
                                 onClick={() => toGuestModal(tempReservation.guests!.length)}>Add guest</button>) 
-                            : (<></>)}
+                            : (<Fragment/>)}
                     </div>
                     <div className="float-end btn-group">
                         {tempReservation.id! < 0 

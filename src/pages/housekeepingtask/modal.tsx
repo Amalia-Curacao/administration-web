@@ -19,11 +19,9 @@ export function CreateHousekeepingTaskModal({ date, room, onSave, onHide }: Crea
         room: room,
         roomNumber: room.number,
         roomScheduleId: room.scheduleId,
-        scheduleId: room.scheduleId,
         type: HousekeepingTaskType.None,
         housekeeper: undefined,
         housekeeperId: undefined,
-        schedule: undefined
     };
 
     return(<HousekeepingTaskModal task={blankTask} onSave={onSave} onHide={onHide}/>);

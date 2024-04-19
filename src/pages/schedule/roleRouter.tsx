@@ -45,7 +45,6 @@ function AdminPage(scheduleId: string): string {
 }
 
 function HousekeepersPage(scheduleId: string): string { 
-    throw new Error("Not implemented");
     return `${pages["housekeeping tasks"].route}/${scheduleId}`;
 }
 

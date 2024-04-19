@@ -77,7 +77,7 @@ function Body(): ReactElement {
                 <tbody>
                     {housekeepers.map((h, index) => !h 
                         ? <Fragment key={index}/> 
-                        : <Row key={index} style={{index: index, readOnly: !editing ? true : editing.id !== h.id}} housekeeper={h} set={Set} on={(h: User) => On(h)}/>)}
+                        : <Row key={index} style={{index: index, readOnly: !editing ? true : editing.id !== h.id}} housekeeper={h} set={Set} on={On}/>)}
                 </tbody>
             </table>
         </div>
